@@ -1,0 +1,1139 @@
+PREFIX::                                            SURFIX::
+#  Primary key group                                ?      nullable       implies =null,  juxtapositioned follower inherits null
+!  Unique group (uniqueness breaks on null)         <++>   serial
+:  (nothing)                                        <+++>  bigserial
+$  Secondary key                                    𝔹      boolean
+£  Grouped secondary key                            $      text
+                                                    $ⁿ     varchar(n)
+                                                    ℤ      integer
+                                                    ℤ₁₆    smallint
+                                                    ℤ₃₂    integer
+                                                    ℤ₆₄    bigint
+                                                    []     type (neither character or numerical)
+                                                    ()     domain
+                                                    =      default       n = FALSE, y = TRUE
+                                                    <f>    foreign key (same attribute name if not explicit)
+                                                    <c>    on delete cascade
+                                                    «»     forking
+                                                    ¿      exact one must not be null, if ended with?, only one may be non-null
+
+
+↑  be symmetrical
+→  be transitive and compressive
+↓  be antisymmetrical and acyclic
+
+[*] = *  [date, time, timestamp, double precision]
+[hash] = varchar(256)
+[blob] = text
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+AccessControlList       # aclid<++>
+                        : ownerℤ₃₂<f:User.userid>
+                        : groupℤ₃₂<f:UserGroup.usergroupid>?
+                        : ownerlist𝔹=y
+                        : ownerread𝔹=y
+                        : owneredit𝔹=y
+                        : grouplist𝔹=y
+                        : groupread𝔹=y
+                        : groupedit𝔹=y
+                        : otherlist𝔹=y
+                        : otherread𝔹=y
+                        : otheredit𝔹=y
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+ErrorReportCatalogue    # errorreportcatid<++>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+ErrorReport             # errorreportid<++>
+                        : isautomatic𝔹
+                        : description$
+                        : summary$¹²⁸
+                        : levelℤ₁₆([1, 5])
+                        : reporterℤ₃₂<f:User.userid>
+                        : reportdatetime[timestamp]
+                        : solverℤ₃₂<f:User.userid>?solvedatetune[timestamp]
+                        : errorreportcatℤ₃₂<fc:ErrorReportCatalogue.errorreportcatid>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+                        
+
+Playlist                # playlistid<++>
+                        : creationdatetime[timestamp]
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+PlaylistTree            # playlistnodeid<++>
+                        : name$
+                        : useridℤ₃₂<fc:User>→  (** restrict userid to parent's)
+                        : parentℤ₃₂<f:PlayListTree.playlistnodeid>↓?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+ColumnAccessControlList # columnaclid<+++>
+                        : listcellruleℤ₁₆(and, or, overrule)=or
+                        : readcellruleℤ₁₆(and, or, overrule)=or
+                        : editcellruleℤ₁₆(and, or, overrule)=or
+                        ! aclℤ₆₄<f:AccessControlList.aclid>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+DatabaseTable           # dbtableid<++>
+                        ! name$
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+DatabaseColumn          # dbcolumnid<++>
+                        ! name$
+                        ! dbtableidℤ₃₂<f:DatabaseTable>
+                        : columnaclidℤ₆₄<f:ColumnAccessControlList>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Table                   # tableidℤ₁₆
+                        : comment$
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Column                  # columnid<++>
+                        ! tablecolumnℤ₁₆([0; ∞[)
+                        ! tableidℤ₁₆<fc:Table>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+AudioEncoding           # audioencodingid<++>
+                        ! name$
+                        : free𝔹?
+                        : description?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+AudioChannels           # audiochannelsid<++>
+                        : name$!
+                        ! dimensionsℤ₁₆([0; 3])
+                        ! discantsℤ₁₆([−1; ∞[)?  (** −1 for undefinied **)
+                        ! basesℤ₁₆([−1; ∞[)?     (** −1 for undefinied **)
+                        ! channelpositioning[blob]?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+AudioResolution         # audioresid<+++>
+                        : bitrateℤ₁₆([1; ∞[)?     (** multiplied by 100 **)
+                        : samplerateℤ₁₆([1; ∞[)?  (** multiplied by 100 **)
+                        : bitratevariationtypeℤ₁₆?
+                        : audioencodingidℤ₃₂<f:AudioEncoding>?
+                        : audiochannelsidℤ₃₂<f:AudioChannels>?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+ColourChannel           # colourid<++>
+                        ! name$
+                        : wavelength[double precision]?
+                        : typeℤ₁₆(blend, colour, property)?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+AnaglyphScheme          # anaglyphid<++>
+                        ! name$
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+3DFrame                 # 3dframeid<++>
+                        : type$!
+                        : anaglyphidℤ₃₂<f:AnaglyphScheme>!?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+FrameResolution         # frameresid<+++>
+                        : widthℤ₁₆([0; ∞[)?
+                        : heightℤ₁₆([0; ∞[)?
+                        : leftofboxℤ₁₆([0; ∞[)?
+                        : rightofboxℤ₁₆([0; ∞[)?
+                        : aboveboxℤ₁₆([0; ∞[)?
+                        : belowboxℤ₁₆([0; ∞[)?
+                        : 3Ddepthℤ₁₆([1; ∞[)?
+                        : colourdepthℤ₁₆([1; ∞[)?
+                        : scan𝔹(progressive, interlaced)?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+License                 # licenseid<++>
+                        : free𝔹?
+                        : gratis𝔹?
+                        : license$!?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+FileFormat              # fileformatid<++>
+                        ! format$
+                        : free𝔹?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+FileMetadata            # filemetaid<+++>
+                        : durationℤ₃₂([0, ∞[)?           (** in milliseconds **)
+                        : heuristicdurationℤ₃₂([0, ∞[)?  (** in milliseconds **)
+                        : framerateℤ₁₆([1, ∞[)?          (** in 0,01 hertz   **)
+                        : adddate[timestamp]
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+FileSector              # filesectorid<++>
+                        ! url$
+                        : limitℤ₆₄([2²⁰; ∞[)?  (** in bytes **)
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Nation                  # nationid<++>
+                        $ nation$¹²⁸!
+                        $ nationality$¹²⁸!
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Language                # languageid<++>
+                        ! language$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Person                  # personid<+++>
+                        $ name$
+                        : birthday[date]?
+                        : gender𝔹(male, female)?
+                        : nationalityℤ₃₂<f:Nation.nationid>?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+UserGroup               # usergroupid<++>
+                        ! name$³²
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Mood                    # moodid<++>
+                        ! mood$⁶⁴
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+TrackType               # tracktypeid<++>
+                        ! type$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+TrackTag                # tracktagid<++>
+                        ! tag$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Genre                   # genreid<++>
+                        ! genre$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Group                   # groupid<++>
+                        $ name$
+                        : description$?
+                        : website$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+GroupName               # groupnameid<++>
+                       £! groupidℤ₆₄<f:Group>
+                       £! name  (** must not be same as Group[groupid].name> **)
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+RecordCompany           # recordcompanyid<++>
+                       $! name$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+ReleaseDate             # releasedateid<++>
+                        : yearℤ₁₆([1; ∞[)
+                        : monthℤ₁₆([1; 12])?dayℤ₁₆(1; ƒ(year, month))?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+AlbumTag                # albumtagid<++>
+                        : tag$¹²⁸    (** type included **)
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Album                   # albumid<+++>
+                        $ title$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Disc                    # discid<++>
+                       £$ albumidℤ₆₄<f:Album>
+                       £: indexℤ₃₂([1, ∞[)=1
+                       £: sideℤ₁₆([1, 2])=1
+                        : title$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Track                   # trackid<+++>
+                        $ title$?
+                        : description$?
+                        $ tracktypeidℤ₃₂<f:TrackType>
+                        $ cover<f:Track.trackid>?covercomment↓?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+InstrumentClass         # instrumentclassid<++>
+                        $ class$⁶⁴
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Instrument              # instrumentid<++>
+                       $! instrument$⁶⁴
+                        $ instrumentclassidℤ₃₂<f:InstrumentClass>?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Artist                  # artistid<+++>
+                        $ scenename$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Author                  # authorid<+++>
+                        $ pseudonym$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+PublishDate             # publishdateid<++>
+                        : yearℤ₁₆([1; ∞[)
+                        : monthℤ₁₆([1; 12])?dayℤ₁₆(1; ƒ(year, month))?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+BookTag                 # booktagid<++>
+                        ! tag$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+BookGenre               # bookgenreid<++>
+                        ! genre$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+GenericBookSeries       # genericbookseriesid<++>
+                        $ name$
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+BookSeries              # bookseriesid<++>
+                        $ name$
+                        $ genericbookseriesidℤ₃₂<f:GenericBookSeries>?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Book                    # bookid<+++>
+                        $ title$
+                        : isbn$⁶⁴?    (** we can use this to get press **)
+                        : publishdateidℤ₃₂<f:PublishDate>?
+                        $ bookseriesidℤ₃₂<f:BookSeries>?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+VoiceActor              # voiceactorid<+++>
+                        : role$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+AudioBookFile           # audiobookfileid<+++>
+                        : firstchapter$¹⁶?lastchapter$¹⁶
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+AudioBook               # audiobookid<++> ??????????????????????????????????????????????????????????????????????????????????????????????????? BOOK
+                        : durationℤ₁₆([1; ∞[)?  (** in milliseconds **)
+                        : publishdateidℤ₃₂<f:PublishDate>?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+PictureArtist           # pictureartistid<+++>
+                        $ alias$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+PictureAlbum            # picturealbumid<+++>
+                        $ title$
+                        : comment$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+PictureTag              # picturetagid<++>
+                        ! tag$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+PictureType             # picturetypeid<++>
+                        ! type$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+PictureGenre            # picturegenreid<++>
+                        ! genre$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Picture                 # pictureid<+++>
+                        $ title$?
+                        : description$?
+                        : yearℤ₁₆([1; ∞[)?monthℤ₁₆([1; 12])?dayℤ₁₆(1; ƒ(year, month))?hourℤ₁₆([0, 24[)?minuteℤ₁₆([0, 60[)?
+                        $ picturetypeidℤ₃₂<f:PictureType>
+                        $ albumidℤ₆₄<f:Album>?position$?
+                        $ bookidℤ₆₄<f:Book>?«figurenrℤ₁₆([0; ∞[)?, comment$?»
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+ClipAuthor              # clipauthorid<+++>
+                        : alias$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+ClipGenre               # clipgenreid<++>
+                        ! genre$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+VideoClip               # videoclipid<+++>
+                        $ name$
+                        : description$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Actor                   # actorid<+++>
+                        : role$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Crew                    # crewid<+++>
+                        : job$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+FilmGenre               # filmgenreid<++>
+                        ! genre$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+FilmTag                 # filmtagid<++>
+                        ! tag$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+GenericSeries           # genericseriesid<++>
+                        $ name$
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Film                    # filmid<++>
+                        $ title$
+                        : description$?
+                        : yearℤ₁₆([1; ∞[)?monthℤ₁₆([1; 12])?dayℤ₁₆(1; ƒ(year, month))?
+                        $ bookidℤ₃₂<f:Book>?  (** filmatisation)
+                        $ genericseriesidℤ₃₂<f:GenericSeries>?
+                        $ prequelℤ₃₂<f:Film.filmid>↓?
+                        $ dubonℤ₃₂<f:Film.filmid>→?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+SeriesTag               # seriestagid<++>
+                        ! tag$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+SeriesType              # seriestypeid<++>
+                        ! type$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+SeriesGenre             # seriesgenreid<++>
+                        ! genre$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Series                  # seriesid<++>
+                        $ title$
+                        : description$?
+                        : yearℤ₁₆([1; ∞[)?
+                        $ bookidℤ₃₂<f:Book>?  (** filmatisation)
+                        $ seriestypeidℤ₃₂<f:SeriesType>
+                        $ genericseriesidℤ₃₂<f:GenericSeries>?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+SeasonTag               # seasontagid<++>
+                        ! tag$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Season                  # seasonid<++>
+                        £ seriesidℤ₃₂<f:Series>
+                        £ indexℤ₁₆([0; ∞[)
+                        : firstyearℤ₁₆([1; ∞[)?lastyearℤ₁₆([firstyear; ∞[)    (** Null lastyear SHOULD indicate that the season has not ended **)
+                        : title$?
+                        : description$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+EpisodeTag              # episodetagid<++>
+                        ! tag$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+EpisodeType             # episodetypeid<+++>
+                        ! type$¹²⁸
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+EpisodeTitle            # episodetitleid<+++>
+                        : title$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+EpisodePart             # episodepartid<++>                                 (** It would be possible to use ‘part’ as the key, and skip this
+                        : partℤ₃₂([1, ∞[)!?                                     relation, however, we do not want null in primary keys.      **)
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Volume                  # volumeid<++>
+                        : indexℤ₃₂([1, ∞[)?
+                        : title$?
+                        : description$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Episode                 # episodeid<+++>
+                       £$ seasonidℤ₃₂<f:Season>
+                        : volumeidℤ₃₂<f:Volume>?
+                        : episodetypeidℤ₃₂<f:EpisodeType>
+                        : discℤ₁₆([1; ∞[)?
+                       £: firstindexℤ₁₆([0; ∞[)?
+                        : lastindexℤ₁₆([firstindex; ∞[)  (** null if firstindex is null **)
+                        : description$?
+                        : yearℤ₁₆([1; ∞[)?monthℤ₁₆([1; 12])?dayℤ₁₆(1; ƒ(year, month))?time[time]?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+IncorrectAiring         # airingid<++>
+                       $! episodeidℤ₆₄<fc:Episode>
+                        : asseasonℤ₁₆([1; ∞[)?
+                        : afterdiscℤ₁₆([1; ∞[)?
+                        : afterepisodeℤ₁₆([0; ∞[)?
+                        : intendeddate[date]?
+                        : reason$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Subtitles               # subtitlesid<++>
+                        : fulltext$?
+                        : trackidℤ₆₄<fc:Track>¿filmidℤ₃₂<fc:Film>¿videoclipidℤ₆₄<fc:VideoClip>¿episodeidℤ₆₄<fc:Episode>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+TimePeriod              # timeperiodid<++>
+                        ! starttimeℤ₃₂([0; ∞[)         (** in milliseconds **)
+                        ! endtimeℤ₃₂(]starttime; ∞[)   (** in milliseconds **)
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+File                    # fileid<+++>
+                        ! url$
+                        : sizeℤ⁶⁴([1; ∞[)  (** in bytes; empty is not allowed any correct file most have content even bigger than 1B **)
+                        : isdeleted𝔹=n
+                        : md5sum[hash]?
+                        : md6sum[hash]?
+                        : sha1sum[hash]?
+                        : sha256sum[hash]?
+                        : sha512sum[hash]?
+                        : sha3sum[hash]?
+                        : fileformatidℤ₃₂<f:FileFormat>
+                        : filemetaidℤ₆₄<f:FileMetadata>!
+                        : trackidℤ₆₄<f:Track>
+                         ¿pictureidℤ₆₄<f:Picture>
+                         ¿bookidℤ₆₄<f:Book>
+                         ¿audiobookfileidℤ₆₄<f:AudioBookFile>
+                         ¿episodeidℤ₆₄<f:Episode>
+                         ¿videoclipidℤ₆₄<f:VideoClip>
+                         ¿filmidℤ₃₂<f:Film>?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+User                    # userid<++>
+                       $! username$³²
+                        : password[hash]  (** sha1 **)
+                        : faceℤ₆₄<f:File.fileid>?
+                        : personidℤ₆₄<f:Person>?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+ColumnDisplay           # columndisplayid<++>
+                        ! useridℤ₃₂<fc:User>
+                        ! columnidℤ₃₂<fc:Column>
+                        : widthℤ₁₆([16; 3072])?
+                        : positionℤ₁₆([0; ∞[)?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+UserSetting             # usersettingid<++>
+                       $! settingalias$²⁵⁶
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+Function                # functionid<++>
+                        ! functionalias$¹²⁸
+                        : description$
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+playlist_tree           # playlistidℤ₃₂<fc:Playlist>
+                        # playlistnodeidℤ₃₂<f:PlaylistTree>
+                        $ name$
+                        : description$?
+                        : lastopened[timestamp]?
+                        : timesopenedℤ₃₂([0, ∞[)=0
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+track_mood              # trackidℤ₆₄<fc:Track>
+                        # moodidℤ₃₂<f:Mood>
+                        # useridℤ₃₂<fc:User>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+group_artist            # groupidℤ₃₂<fc:Group>
+                        # artistid?ℤ₆₄<f:Artist>
+                        # instrumentid?ℤ₃₂<f:Instrument>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+episode_part_title     !# episodeidℤ₆₄<fc:Episode>
+                        # episodepartidℤ₆₄<f:EpisodePart>
+                        # episodetitleidℤ₆₄<f:EpisodeTitle>
+                       !: indexℤ₃₂([0, ∞[)
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+episode_tag             # episodeidℤ₆₄<fc:Episode>
+                        # episodetagidℤ₃₂<f:EpisodeTag>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+film_soundtrack         # filmidℤ₃₂<fc:Film>
+episode_soundtrack      # episodeidℤ₆₄<fc:Episode>
+                        # trackidℤ₆₄<fc:Track>
+                        : istheme𝔹
+                        : comment$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+film_clip               # filmidℤ₃₂<fc:Film>
+                        # videoclipℤ₆₄<fc:VideoClip>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+film_actor              # filmidℤ₃₂<fc:Film>
+series_actor            # seriesidℤ₃₂<fc:Series>
+                        # actoridℤ₆₄<f:Actor>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+film_crew               # filmidℤ₃₂<fc:Film>
+series_crew             # seriesidℤ₃₂<fc:Series>
+                        # crewidℤ₆₄<f:Crew>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+user_setting            # useridℤ₃₂<fc:User>
+                        # usersettingidℤ₃₂<fc:UserSetting>
+                        : value[blob]
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+                        # useridℤ₃₂<fc:User>
+function_tested         # functionidℤ₃₂<fc:Function>
+user_group              # usergroupidℤ₃₂<fc:UserGroup>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+                        # aclidℤ₆₄<fc:AccessControlList>
+acl_secondary_user      # useridℤ₃₂<fc:User>
+acl_secondary_group     # usergroupidℤ₃₂<fc:UserGroup>
+                        : list𝔹=y
+                        : read𝔹=y
+                        : edit𝔹=y
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+                        # fileidℤ₆₄<fc:File>
+file_sector             # filesectoridℤ₃₂<fc:FileSector>
+file_license            # licenseidℤ₃₂<f:License>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+file_audio             !# filemetaidℤ₆₄<fc:FileMetadata>
+                        # audioresidℤ₆₄<f:AudioResolution>
+                       !: indexℤ₃₂([0, ∞[)
+                        : name$⁴⁸?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+file_frame             !# filemetaidℤ₆₄<fc:FileMetadata>
+                        # frameresidℤ₆₄<f:FrameResolution>
+                       !: indexℤ₃₂([0, ∞[)
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+                        # frameresidℤ₆₄<fc:FrameResolution>
+frame_3d                # 3dframeidℤ₃₂<f:3DFrame>
+frame_colour            # colouridℤ₃₂<f:ColourChannel>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+language_inheritance↓   # parentℤ₃₂<f:Language.languageid>
+                        # childℤ₃₂<fc:Language.languageid>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+speaks                  # personidℤ₆₄<fc:Person>
+                        # languageidℤ₃₂<f:Language>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+track_tag               # trackidℤ₆₄<fc:Track>
+                        # tracktagidℤ₃₂<f:TrackTag>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+track_genre             # trackidℤ₆₄<fc:Track>
+                        # genreidℤ₃₂<f:Genre>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+genre_inheritance↓      # parentℤ₃₂<f:Genre.genreid>
+                        # childℤ₃₂<fc:Genre.genreid>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+highly_related_group↑   # relaterℤ₃₂<fc:Group.groupid>
+                        # relateeℤ₃₂<fc:Group.groupid>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+album_recordcompany     # albumidℤ₆₄<fc:Album>
+                        # recordcompanyidℤ₃₂<fc:RecordCompany>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+album_tag               # albumidℤ₆₄<fc:Album>
+                        # albumtagidℤ₆₄<f:AlbumTag>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+disc_track            £!# discidℤ₃₂<f:Disc>
+                        # trackidℤ₆₄<fc:Track>
+                      £!: indexℤ₃₂([1, ∞[)?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+featured_group          # trackidℤ₆₄<fc:Track>
+                        # groupidℤ₃₂<fc:Group>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+group_album           £!# groupidℤ₃₂<f:Group>
+                        # albumidℤ₆₄<fc:Album>
+                      £!: indexℤ₃₂([1, ∞[)?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+group_picture           # groupidℤ₃₂<fc:Group>
+                        # pictureidℤ₆₄<fc:Picture>
+                        : comment$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+                        # pictureidℤ₆₄<fc:Picture>
+picture_artist          # pictureartistidℤ₆₄<f:PictureArtist>
+picture_tag             # picturetagidℤ₃₂<f:PictureTag>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+picture_album          £# pictureidℤ₆₄<fc:Picture>
+                        # picturealbumidℤ₆₄<f:PictureAlbum>
+                       £: indexℤ₃₂([0, ∞[)?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+picture_genre           # pictureidℤ₆₄<fc:Picture>
+                        # picturegenreidℤ₃₂<f:PictureGenre>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+pic_genre_inheritance↓  # parentℤ₃₂<f:PictureGenre.picturegenreid>
+                        # childℤ₃₂<fc:PictureGenre.picturegenreid>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+book_voice              # audiobookidℤ₃₂<fc:AudioBook>
+                        # voiceactoridℤ₆₄<f:VoiceActor>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+audiobook_file        £!# audiobookidℤ₃₂<fc:AudioBook>
+                        # audiobookfileidℤ₆₄<f:AudioBookFile>
+                      £!: indexℤ₃₂([0, ∞[)
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+                        # bookidℤ₆₄<fc:Book>
+book_tag                # booktagiddℤ₃₂<f:BookTag>
+book_author             # authoriddℤ₆₄<f:Author>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+book_genre              # bookidℤ₆₄<fc:Book>
+                        # bookgenreidℤ₃₂<f:BookGenre>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+book_genre_inheritance↓ # parentℤ₆₄<f:Book.bookid>
+                        # childℤ₆₄<fc:Book.bookid>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+translation→            # originalℤ₆₄<fc:Book.bookid>
+                        # translationℤ₆₄<fc:Book.bookid>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+highly_related_book↑    # relaterℤ₆₄<fc:Book.bookid>
+                        # relateeℤ₆₄<fc:Book.bookid>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+subtitles_time          # subtitlesidℤ₃₂<fc:Subtitles>
+                        # timeperiodidℤ₃₂<f:TimePeriod>
+                        : text$¹²⁸
+                        : backcolourℤ₃₂?    (** alphaℤ⁸, redℤ⁸, greenℤ⁸, blueℤ⁸)
+                        : forecolourℤ₃₂?    (** alphaℤ⁸, redℤ⁸, greenℤ⁸, blueℤ⁸)
+                        : bordercolourℤ₃₂?  (** alphaℤ⁸, redℤ⁸, greenℤ⁸, blueℤ⁸)
+                        : isattop𝔹=n
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+clip_author             # videoclipidℤ₆₄<fc:VideoClip>
+                        # clipathoridℤ₆₄<f:ClipAuthor>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+clip_genre              # videoclipidℤ₆₄<fc:VideoClip>
+                        # clipgenreidℤ₃₂<f:ClipGenre>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+clip_genre_inheritance↓ # parentℤ₃₂<f:ClipGenre.clipgenreid>
+                        # childℤ₃₂<fc:ClipGenre.clipgenreid>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+related_clip↑           # relaterℤ₆₄<fc:VideoClip.videoclipid>
+                        # relateeℤ₆₄<fc:VideoClip.videoclipid>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+next_clip↓              # currentℤ₆₄<fc:VideoClip.videoclipid>
+                        # nextℤ₆₄<fc:VideoClip.videoclipid>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+film_tag                # filmidℤ₃₂<fc:Film>
+                        # filmtagidℤ₃₂<f:FilmTag>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+film_genre              # filmidℤ₃₂<fc:Film>
+                        # filmgenreidℤ₃₂<f:FilmGenre>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+film_genre_inheritance↓ # parentℤ₃₂<f:FilmGenre.filmgenreid>
+                        # childℤ₃₂<fc:FilmGenre.filmgenreid>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+highly_related_film↑    # relaterℤ₃₂<fc:FilmGenre.filmgenreid>
+                        # relateeℤ₃₂<fc:FilmGenre.filmgenreid>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+series_tag              # seriesidℤ₃₂<fc:Season>
+                        # seriestagidℤ₃₂<f:SeasonTag>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+series_genre            # seriesidℤ₃₂<fc:Series>
+                        # seriesgenreidℤ₃₂<f:SeriesGenre>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+tv_genre_inheritance↓   # parentℤ₃₂<f:SeriesGenre.seriesgenreid>
+                        # childℤ₃₂<fc:SeriesGenre.seriesgenreid>
+                        : dominanceℤ₁₆([0, 9])=5
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+highly_related_series↑  # relaterℤ₃₂<fc:Season.seriesid>
+                        # relateeℤ₃₂<fc:Season.seriesid>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+season_tag              # seasonidℤ₃₂<fc:Season>
+                        # seasontagidℤ₃₂<f:SeasonTag>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+track_language          # trackidℤ₆₄<fc:Track>
+subtitles_language      # subtitlesidℤ₃₂<fc:Subtitles>
+videoclip_language      # videoclipidℤ₆₄<fc:VideoClip>
+picture_language        # pictureidℤ₆₄<fc:Picture>
+book_language           # bookidℤ₆₄<fc:Book>
+series_language         # seriesidℤ₃₂<fc:Series>
+film_language           # filmidℤ₃₂<fc:Film>
+                        # languageidℤ₃₂<f:Language>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+group_orgin             # groupidℤ₃₂<fc:Group>
+picture_country         # pictureidℤ₆₄<fc:Picture>
+book_origin             # bookidℤ₆₄<fc:Book>
+series_origin           # seriesidℤ₃₂<fc:Series>
+film_origin             # filmidℤ₃₂<fc:Film>
+                        # nationidℤ₃₂<fc:Nation>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+series_crossover        # episodeidℤ₆₄<fc:Episode>
+                        # seriesidℤ₃₂<fc:Series>
+                        : comment$?
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+artist_person           # artistidℤ₆₄<fc:Artist>
+picture_artist_person   # pictureartistidℤ₆₄<fc:PictureArtist>
+voice_actor_person      # voiceactoridℤ₆₄<fc:VoiceActor>
+author_person           # authoridℤ₆₄<fc:Author>
+clip_author_person      # clipauthoridℤ₆₄<fc:ClipAuthor>
+actor_person            # actoridℤ₆₄<fc:Actor>
+crew_person             # crewidℤ₆₄<fc:Crew>
+                        # personidℤ₆₄<f:Person>
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+track_user              # trackidℤ₆₄<fc:Track>
+group_user              # groupidℤ₃₂<fc:Group>
+album_user              # albumidℤ₆₄<fc:Album>
+picture_user            # pictureidℤ₆₄<fc:Picture>
+audio_book_user         # audiobookidℤ₃₂<fc:AudioBook>
+book_user               # bookidℤ₆₄<fc:Book>
+book_genre_user         # bookgenreidℤ₃₂<fc:BookGenre>
+book_series_user        # bookseriesidℤ₃₂<fc:BookSeries>
+episode_user            # episodeidℤ₆₄<fc:Episode>
+volume_user             # volumeidℤ₃₂<fc:Volume>
+season_user             # seasonidℤ₃₂<fc:Season>
+series_user             # seriesidℤ₃₂<fc:Series>
+series_genre_user       # seriesgenreidℤ₃₂<fc:SeriesGenre>
+video_clip_user         # videoclipidℤ₆₄<fc:VideoClip>
+clip_genre_user         # clipgenreidℤ₃₂<fc:ClipGenre>
+film_user               # filmidℤ₃₂<fc:Film>
+film_genre_user         # filmgenreidℤ₃₂<fc:FilmGenre>
+                        # useridℤ₆₄<fc:User>
+                        $ ratingℤ₁₆([−4, 4])?
+                        : lastplayed[timestamp]?
+                        : timesplayedℤ₃₂([0, ∞[)=0
+                        $ favourlevelℤ₁₆([−2, 2])=0
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+                        # playlistidℤ₃₂<fc:Playlist>
+playlist_track          # trackidℤ₆₄<fc:Track>
+playlist_picture        # pictureidℤ₆₄<fc:Picture>
+playlist_book           # bookidℤ₆₄<fc:Book>
+playlist_audio_book     # audiobookfileidℤ₆₄<fc:AudioBookFile>
+playlist_episode        # episodeidℤ₆₄<fc:Episode>
+playlist_videoclip      # videoclipidℤ₆₄<fc:VideoClip>
+playlist_film           # filmidℤ₃₂<fc:Film>
+                        $ indexℤ₃₂([0, ∞[)                        (** No uniqueness to make edits easier **)
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+
+album_release           # albumidℤ₆₄<f:Album>?
+                        # groupidℤ₃₂<f:Group>?
+                        : releasedateidℤ₃₂<f:ReleaseDate>¿ordinalℤ₁₆([1; ∞[)?    (** All same albumid must share releasedateid **)
+                        : aclidℤ₆₄<f:AccessControlList>
+                        : errorreportcatidℤ₃₂<f:ErrorReportCatalogue>?
+
+

@@ -1,0 +1,263 @@
+?       nullable (implies =null), if null juxtapositioned follower must be null
+!       unique, juxtapositioned follower is included in unique group (mandatory on identity attributes)
+=       default
+()      values
+[]      type (neither character, numeral nor booleanic)
+<>      comment
+→       be transitive and compressive
+↑       be symmetrical
+↓       be antisymmetrical and acyclic
+
+
+(**
+        Adopted ‘series–season’ from Transatlantic/American English,
+        British English otherwise used.
+ )
+
+
+┌───────────────┬─────────────────────────┬────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────┐
+│ Type::        │ Name::                  │ Identity attribute::               │ Property attribute::                                                       │
+╞═══════════════╪═════════════════════════╪════════════════════════════════════╪════════════════════════════════════════════════════════════════════════════╡
+│ Object        │ Playlist                │ playlistid                         │ creationdatetime[timestamp]                                                │
+│ Object        │ PlaylistTree            │ playlistnodeid                     │ name                                                                       │
+│ Object        │ Table                   │ tableid                            │ name!                                                                      │
+│ Object        │ Column                  │ columnid                           │ name                                                                       │
+│ Object        │ ColumnDisplay           │ columndisplayid                    │ width?, position?                                                          │
+│ Object        │ ColumnAccessControlList │ columnaclid                        │ {list,read,edit}cellrule(and/=or/overrule)                                 │
+│ Object        │ User                    │ userid                             │ username!, password[sha1hash]                                              │
+│ Object        │ UserSetting             │ usersettingid                      │ -                                                                          │
+│ Object        │ Function                │ functionid                         │ -                                                                          │
+│ Object        │ UserGroup               │ usergroupid                        │ name!                                                                      │
+│ Object        │ AccessControlList       │ aclid                              │ otherlist=y, otherread=y, otheredit=n                                      │
+│ Object        │ ErrorReport             │ errorreportid                      │ isautomatic, description, summary, level, solvedate[timestamp]?            │
+│ Object        │ File                    │ fileid                             │ url!, size, isdeleted=n, {md5, md6, sha{1, 256, 512, 3}}sum[hash]?         │
+│ Object        │ FileSector              │ filesectorid                       │ url!, limit?                                                               │
+│ Object        │ License                 │ licenseid                          │ free?, gratis?, license?                                                   │
+│ Object        │ FileMetadata            │ filemetaid                         │ duration? heuristicduration? adddate[timestamp], framerate?                │
+│ Object        │ FileFormat              │ fileformatid                       │ format!, free?                                                             │
+│ Object        │ AudioResolution         │ audioresid                         │ bitrate?, samplerate?, bitratevariationtype?                               │
+│ Object        │ AudioEncoding           │ audioencodingid                    │ name!, free?, description?                                                 │
+│ Object        │ AudioChannels           │ audiochannelsid                    │ name!, dimensions, discants, bases                                         │
+│ Object        │ FrameResolution         │ frameresid                         │ width?, height?, 3Ddepth?, colourdepth?, scan?                             │
+│ Object        │ ColourChannel           │ colourid                           │ name!, wavelength?, type(blend/colour/property)?                           │
+│ Object        │ 3DFrame                 │ 3dframeid                          │ type!                                                                      │
+│ Object        │ AnaglyphScheme          │ anaglyphid                         │ name!                                                                      │
+│ Object        │ Person                  │ persionid                          │ name, birthday?, gender?                                                   │
+│ Object        │ Nation                  │ nationid                           │ nation!, nationallity!                                                     │
+│ Object        │ Language                │ languageid                         │ language!                                                                  │
+│ Object        │ Mood                    │ moodid                             │ mood!                                                                      │
+│ Object        │ Track                   │ trackid                            │ title? description?                                                        │
+│ Object        │ TrackType               │ tracktypeid                        │ type!                                                                      │
+│ Object        │ TrackTag                │ tracktagid                         │ tag!                                                                       │
+│ Object        │ Genre                   │ genreid                            │ genre!                                                                     │
+│ Object        │ Disc                    │ discid                             │ title?                                                                     │
+│ Object        │ Group                   │ groupid                            │ name, description?, website?                                               │
+│ Object        │ GroupName               │ groupnameid                        │ name                                                                       │
+│ Object        │ Artist                  │ artistid                           │ scenename?                                                                 │
+│ Object        │ Instrument              │ instrumentid                       │ instrument!, class?                                                        │
+│ Object        │ Album                   │ albumid                            │ title?                                                                     │
+│ Object        │ AlbumTag                │ albumtagid                         │ tag<type included>                                                         │
+│ Object        │ ReleaseDate             │ releasedateid                      │ year?month?day?ordinal?                                                    │
+│ Object        │ RecordCompany           │ recordcompanyid                    │ name!                                                                      │
+│ Object        │ Picture                 │ pictureid                          │ title?, description?, year?month?day?hour?minute?                          │
+│ Object        │ PictureArtist           │ pictureartistid                    │ alias?                                                                     │
+│ Object        │ PictureTag              │ picturetagid                       │ tag!                                                                       │
+│ Object        │ PictureType             │ picturetypeid                      │ type!                                                                      │
+│ Object        │ PictureAlbum            │ picturealbumid                     │ title, comment?                                                            │
+│ Object        │ PictureGenre            │ picturegenreid                     │ genre!                                                                     │
+│ Object        │ VoiceActor              │ voiceactorid                       │ role?                                                                      │
+│ Object        │ AudioBook               │ audiobookid                        │ duration?                                                                  │
+│ Object        │ AudioBookFile           │ audiobookfileid                    │ firstchapter?lastchapter                                                   │
+│ Object        │ Author                  │ authorid                           │ psuedonym?                                                                 │
+│ Object        │ PublishDate             │ publishdateid                      │ year?month?day?                                                            │
+│ Object        │ Book                    │ bookid                             │ title, isbn<we can use this to get press>?                                 │
+│ Object        │ BookTag                 │ booktagid                          │ tag!                                                                       │
+│ Object        │ BookGenre               │ bookgenreid                        │ genre!                                                                     │
+│ Object        │ BookSeries              │ bookseriesid                       │ name                                                                       │
+│ Object        │ GenericBookSeries       │ genericbookseriesid                │ name                                                                       │
+│ Object        │ Subtitles               │ subtitlesid                        │ fulltext?                                                                  │
+│ Object        │ TimePeriod              │ timeperiodid                       │ starttime!endtime!                                                         │
+│ Object        │ VideoClip               │ videoclipid                        │ name, description?                                                         │
+│ Object        │ ClipAuthor              │ clipauthorid                       │ alias?                                                                     │
+│ Object        │ ClipGenre               │ clipgenreid                        │ genre!                                                                     │
+│ Object        │ Film                    │ filmid                             │ title, year?month?day?, description?                                       │
+│ Object        │ FilmGenre               │ filmgenreid                        │ genre!                                                                     │
+│ Object        │ FilmTag                 │ filmtagid                          │ tag!                                                                       │
+│ Object        │ GenericSeries           │ genericseriesid                    │ name                                                                       │
+│ Object        │ Actor                   │ actorid                            │ role?                                                                      │
+│ Object        │ Crew                    │ crewid                             │ job?                                                                       │
+│ Object        │ Series                  │ seriesid                           │ title, description?, year?                                                 │
+│ Object        │ SeriesTag               │ seriestagid                        │ tag!                                                                       │
+│ Object        │ SeriesType              │ seriestypeid                       │ type!                                                                      │
+│ Object        │ SeriesGenre             │ seriesgenreid                      │ genre!                                                                     │
+│ Object        │ Season                  │ seasonid                           │ firstyear?lastyear, title?, description?                                   │
+│ Object        │ SeasonTag               │ seasontagid                        │ tag!                                                                       │
+│ Object        │ Episode                 │ episodeid                          │ disc?, firstindex?latindex, description?, year?month?day?time[time]?       │
+│ Object        │ EpisodeTag              │ episodetagid                       │ tag!                                                                       │
+│ Object        │ EpisodeType             │ episodetypeid                      │ type!                                                                      │
+│ Object        │ EpisodeTitle            │ episodetitleid                     │ title?                                                                     │
+│ Object        │ EpisodePart             │ episodepartid                      │ part?                                                                      │
+│ Object        │ Volume                  │ volumeid                           │ index?, title?, description?                                               │
+│ Object        │ IncorrectAiring         │ airingid                           │ asseason? afterdisc? afterepisode?, intendeddate[date]?                    │
+╞═══════════════╪═════════════════════════╪════════════════════════════════════╪════════════════════════════════════════════════════════════════════════════╡
+│ 1:1-relation  │ column_acl              │ columnid, columnaclid              │ -                                                                          │
+│ 1:1-relation  │ file_metadata           │ fileid, filemetaid                 │ -                                                                          │
+│ 1:1-relation  │ 3d_scheme               │ 3dframeid, anaglyphid?             │ -                                                                          │
+│ 1:1-relation  │ album_release           │ albumid, releasedateid             │ -                                                                          │
+│ 1:1-relation  │ episode_airing          │ episodeid, airingid                │ -                                                                          │
+├───────────────┼─────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ 1:N-relation↓ │ playlist_tree_child     │ {parent, child}(playlistnodeid)    │ -                                                                          │
+│ 1:N-relation  │ table_column            │ tableid, columnid                  │ -                                                                          │
+│ 1:N-relation  │ column_display          │ columnid, columndisplayid          │ -                                                                          │
+│ 1:N-relation  │ user_columndisplay      │ userid, colourdisplayid            │ -                                                                          │
+│ 1:N-relation  │ group_alt_name          │ groupid, groupnameid               │ -                                                                          │
+│ 1:N-relation  │ album_disc              │ albumid, discid                    │ index=1, side=1                                                            │
+│ 1:N-relation  │ album_cover             │ albumid, pictureid                 │ position?                                                                  │
+│ 1:N-relation  │ book_picture            │ bookid, pictureid                  │ figureid?, comment?                                                        │
+│ 1:N-relation→ │ film_dub                │ {original, dub}(filmid)            │ -                                                                          │
+│ 1:N-relation↓ │ sequel                  │ {current, next}(filmid)            │ -                                                                          │
+│ 1:N-relation  │ track_subtitles         │ trackid, subtitlesid               │ -                                                                          │
+│ 1:N-relation  │ film_subtitles          │ filmid, subtitlesid                │ -                                                                          │
+│ 1:N-relation  │ videoclip_subtitles     │ videoclipid, subtitlesid           │ -                                                                          │
+│ 1:N-relation  │ episode_subtitles       │ episodeid, subtitlesid             │ -                                                                          │
+│ 1:N-relation  │ track_file              │ trackid, fileid                    │ -                                                                          │
+│ 1:N-relation  │ picture_file            │ pictureid, fileid                  │ -                                                                          │
+│ 1:N-relation  │ book_file               │ bookid, fileid                     │ -                                                                          │
+│ 1:N-relation  │ audio_book_file         │ audiobookfileid, fileid            │ -                                                                          │
+│ 1:N-relation  │ episode_file            │ episodeid, fileid                  │ -                                                                          │
+│ 1:N-relation  │ videoclip_file          │ videoclipid, fileid                │ -                                                                          │
+│ 1:N-relation  │ film_file               │ filmid, fileid                     │ -                                                                          │
+│ 1:N-relation  │ series_season           │ seriesid, seasonid                 │ index                                                                      │
+│ 1:N-relation  │ season_episode          │ seasonid, episodeid                │ index?                                                                     │
+├───────────────┼─────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ N:1-relation  │ film_generic            │ filmid, genericseriesid            │ -                                                                          │
+│ N:1-relation  │ series_generic          │ seriesid, genericseriesid          │ -                                                                          │
+│ N:1-relation  │ column_acl              │ columnaclid, aclid                 │ -                                                                          │
+│ N:1-relation  │ acl_owner               │ aclid, userid                      │ list=y, read=y, edit=y                                                     │
+│ N:1-relation  │ acl_group               │ aclid, usergroupid?                │ list=y, read=y, edit=y                                                     │
+│ N:1-relation  │ user_face               │ userid, fileid?                    │ -                                                                          │
+│ N:1-relation  │ file_format             │ fileid, fileformatid?              │ -                                                                          │
+│ N:1-relation  │ audio_encoding          │ audioresid, audioencodingid?       │ -                                                                          │
+│ N:1-relation  │ audio_channels          │ audioresid, audiochannelsid?       │ -                                                                          │
+│ N:1-relation  │ user_person             │ userid, personid?                  │ -                                                                          │
+│ N:1-relation  │ nationality             │ personid, nationid?                │ -                                                                          │
+│ N:1-relation  │ track_type              │ trackid, tracktypeid               │ -                                                                          │
+│ N:1-relation  │ picture_type            │ pictureid, picturetypeid           │ -                                                                          │
+│ N:1-relation  │ audiobook_publish       │ audiobookid, publishdateid         │ -                                                                          │
+│ N:1-relation  │ book_publish            │ bookid, publishdateid              │ -                                                                          │
+│ N:1-relation  │ book_series             │ bookid, bookseriesid?              │ -                                                                          │
+│ N:1-relation  │ series_type             │ seriesid, seriestypeid             │ -                                                                          │
+│ N:1-relation  │ episode_volume          │ episodeid, volumeid                │ -                                                                          │
+│ N:1-relation  │ episode_type            │ episodeid, episodetypeid           │ -                                                                          │
+├───────────────┼─────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ N:M-relation  │ episode_tag             │ episodeid, episodetagid            │ -                                                                          │
+│ N:M-relation  │ film_soundtrack         │ filmid, trackid                    │ istheme, comment?                                                          │
+│ N:M-relation  │ episode_soundtrack      │ episodeid, trackid                 │ istheme, comment?                                                          │
+│ N:M-relation  │ film_clip               │ filmid, videoclip                  │ -                                                                          │
+│ N:M-relation  │ film_actor              │ filmid, actorid                    │ -                                                                          │
+│ N:M-relation  │ series_actor            │ seriesid, actorid                  │ -                                                                          │
+│ N:M-relation  │ film_crew               │ filmid, crewid                     │ -                                                                          │
+│ N:M-relation  │ series_crew             │ seriesid, crewid                   │ -                                                                          │
+│ N:M-relation  │ user_setting            │ userid, usersettingid              │ value[blob]                                                                │
+│ N:M-relation  │ function_tested         │ userid, functionid                 │ -                                                                          │
+│ N:M-relation  │ user_group              │ userid, usergroupid                │ -                                                                          │
+│ N:M-relation  │ acl_secondary_user      │ aclid, userid                      │ list=y, read=y, edit=y                                                     │
+│ N:M-relation  │ acl_secondary_group     │ aclid, usergroupid                 │ list=y, read=y, edit=y                                                     │
+│ N:M-relation  │ file_license            │ fileid, licenseid                  │ -                                                                          │
+│ N:M-relation  │ file_sector             │ fileid, filesectorid               │ -                                                                          │
+│ N:M-relation  │ file_audio              │ filemetaid, audioresid             │ index, name?                                                               │
+│ N:M-relation  │ file_frame              │ filemetaid, frameresid             │ index                                                                      │
+│ N:M-relation  │ frame_colour            │ frameresid, colourid               │ -                                                                          │
+│ N:M-relation  │ frame_3d                │ frameresid, 3dframeid              │ -                                                                          │
+│ N:M-relation↓ │ language_inheritance    │ {parent, child}(languageid)        │ -                                                                          │
+│ N:M-relation  │ speaks                  │ personid, languageid               │ -                                                                          │
+│ N:M-relation  │ track_tag               │ trackid, tracktagid                │ -                                                                          │
+│ N:M-relation  │ track_genre             │ trackid, genreid                   │ dominance(1–9)=5                                                           │
+│ N:M-relation↓ │ genre_inheritance       │ {parent, child}(genreid)           │ dominance(1–9)=5                                                           │
+│ N:M-relation↑ │ highly_related_group    │ {relater, relatee}(group)          │ -                                                                          │
+│ N:M-relation  │ album_recordcompany     │ albumid, recordcompanyid           │ -                                                                          │
+│ N:M-relation  │ album_tag               │ albumid, albumtagid                │ -                                                                          │
+│ N:M-relation  │ disc_track              │ discid, trackid                    │ index?                                                                     │
+│ N:M-relation  │ featured_group          │ trackid, groupid                   │ -                                                                          │
+│ N:M-relation  │ group_album             │ groupid, albumid                   │ index?                                                                     │
+│ N:M-relation  │ group_picture           │ groupid, pictureid                 │ comment?                                                                   │
+│ N:M-relation  │ picture_tag             │ pictureid, picturetagid            │ -                                                                          │
+│ N:M-relation  │ picture_artist          │ pictureid, pictureartistid         │ -                                                                          │
+│ N:M-relation  │ picture_album           │ pictureid, picturealbumid          │ index?                                                                     │
+│ N:M-relation  │ picture_genre           │ pictureid, picturegenreid          │ dominance(1–9)=5                                                           │
+│ N:M-relation↓ │ pic_genre_inheritance   │ {parent, child}(picturegenreid)    │ dominance(1–9)=5                                                           │
+│ N:M-relation  │ book_voice              │ audiobookid, voiceactorid          │ -                                                                          │
+│ N:M-relation  │ audiobook_file          │ audiobookid, audiobookfileid       │ index                                                                      │
+│ N:M-relation  │ book_tag                │ bookid, booktagid                  │ -                                                                          │
+│ N:M-relation  │ book_author             │ bookid, authorid                   │ -                                                                          │
+│ N:M-relation  │ book_genre              │ bookid, bookgenreid                │ dominance(1–9)=5                                                           │
+│ N:M-relation↓ │ book_genre_inheritance  │ {parent, child}(bookid)            │ dominance(1–9)=5                                                           │      
+│ N:M-relation→ │ translation             │ {original, translation}(bookid)    │ -                                                                          │
+│ N:M-relation↑ │ highly_related_book     │ {relater, relatee}(bookid)         │ -                                                                          │
+│ N:M-relation  │ subtitle_time           │ subtitlesid, timeperiodid          │ text, colour?, isattop=n                                                   │
+│ N:M-relation  │ clip_author             │ videoclipid, clipathorid           │ -                                                                          │
+│ N:M-relation  │ clip_genre              │ videoclipid, clipgenreid           │ dominance(1–9)=5                                                           │
+│ N:M-relation↓ │ clip_genre_inheritance  │ {parent, child}(clipgenreid)       │ dominance(1–9)=5                                                           │
+│ N:M-relation↑ │ related_clip            │ {relater, relatee}(videoclipid)    │ -                                                                          │
+│ N:M-relation↓ │ next_clip               │ {current, next}(videoclipid)       │ -                                                                          │
+│ N:M-relation  │ film_tag                │ filmid, filmtagid                  │ -                                                                          │
+│ N:M-relation  │ film_genre              │ filmid, filmgenreid                │ dominance(1–9)=5                                                           │
+│ N:M-relation↓ │ film_genre_inheritance  │ {parent, child}(filmgenreid)       │ dominance(1–9)=5                                                           │
+│ N:M-relation↑ │ highly_related_film     │ {relater, relatee}(filmgenreid)    │ -                                                                          │
+│ N:M-relation  │ series_tag              │ seriesid, seriestagid              │ -                                                                          │
+│ N:M-relation  │ series_genre            │ seriesid, seriesgenreid            │ dominance(1–9)=5                                                           │
+│ N:M-relation↓ │ tv_genre_inheritance    │ {parent, child}(seriesgenreid)     │ dominance(1–9)=5                                                           │
+│ N:M-relation↑ │ highly_related_series   │ {relater, relatee}(seriesid)       │ -                                                                          │
+│ N:M-relation  │ season_tag              │ seasonid, seasontagid              │ -                                                                          │
+│ N:M-relation  │ group_orgin             │ groupid, nationid                  │ -                                                                          │
+│ N:M-relation  │ track_language          │ trackid, languageid                │ -                                                                          │
+│ N:M-relation  │ subtitle_language       │ subtitleid, languageid             │ -                                                                          │
+│ N:M-relation  │ videoclip_language      │ videoclipid, languageid            │ -                                                                          │
+│ N:M-relation  │ picture_country         │ pictureid, nationid                │ -                                                                          │
+│ N:M-relation  │ picture_language        │ pictureid, languageid              │ -                                                                          │
+│ N:M-relation  │ book_origin             │ bookid, nationid                   │ -                                                                          │
+│ N:M-relation  │ book_language           │ bookid, languageid                 │ -                                                                          │
+│ N:M-relation  │ series_origin           │ seriesid, nationid                 │ -                                                                          │
+│ N:M-relation  │ series_language         │ seriesid, languageid               │ -                                                                          │
+│ N:M-relation  │ film_origin             │ filmid, nationid                   │ -                                                                          │
+│ N:M-relation  │ film_language           │ filmid, languageid                 │ -                                                                          │
+│ N:M-relation  │ series_crossover        │ episodeid, seriesid                │ comment?                                                                   │
+│ N:M-relation  │ artist_person           │ artistid, personid                 │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ picture_artist_person   │ pictureartistid, personid          │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ voice_actor_person      │ voiceactorid, personid             │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ author_person           │ authorid, personid                 │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ clip_author_person      │ clipauthorid, personid             │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ actor_person            │ actorid, personid                  │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ crew_person             │ crewid, personid                   │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ track_user              │ trackid, personid                  │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ group_user              │ groupid, personid                  │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ album_user              │ albumid, personid                  │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ picture_user            │ pictureid, personid                │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ audio_book_user         │ audiobookid, personid              │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ book_user               │ bookid, personid                   │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ book_genre_user         │ bookgenreid, personid              │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ book_series_user        │ bookseriesid, personid             │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ episode_user            │ episodeid, personid                │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ volumn_user             │ volumnid, personid                 │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ season_user             │ seasonid, personid                 │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ series_user             │ seriesid, personid                 │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ series_genre_user       │ seriesgenreid, personid            │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ video_clip_user         │ videoclipid, personid              │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ clip_genre_user         │ clipgenreid, personid              │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ film_user               │ filmid, personid                   │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ film_genre_user         │ filmgenreid, personid              │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0 │
+│ N:M-relation  │ playlist_track          │ playlistid, trackid                │ index                                                                      │
+│ N:M-relation  │ playlist_picture        │ playlistid, pictureid              │ index                                                                      │
+│ N:M-relation  │ playlist_book           │ playlistid, bookid                 │ index                                                                      │
+│ N:M-relation  │ playlist_audio_book     │ playlistid, audiobookfileid        │ index                                                                      │
+│ N:M-relation  │ playlist_episode        │ playlistid, episodeid              │ index                                                                      │
+│ N:M-relation  │ playlist_videoclip      │ playlistid, videoclipid            │ index                                                                      │
+│ N:M-relation  │ playlist_film           │ playlistid, filmid                 │ index                                                                      │
+├───────────────┼─────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ 3-relation    │ user_playlist           │ userid, playlistid, playlistnodeid │ name, description?, lastopened?, timesopened=0                             │
+│ 3-relation    │ track_mood              │ trackid, moodid, userid            │ -                                                                          │
+│ 3-relation    │ group_artist            │ groupid, artistid?, instrumentid?  │ -                                                                          │
+│ 3-relation    │ episode_part_title      │ episode{, part, title}id           │ index                                                                      │
+└───────────────┴─────────────────────────┴────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────┘
+Addition:  ErrorReport  N──────────1  [:all tuples:]  <yes, you can error report an error-report>
+           AccessControlList  1────N  [:all tuples:]

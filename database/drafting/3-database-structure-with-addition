@@ -1,0 +1,191 @@
+Playlist                │ playlistid                         │ creationdatetime[timestamp], aclid, errorreportcatid?
+PlaylistTree            │ playlistnodeid                     │ name, parent:playlistnodeid↓?, aclid, errorreportcatid?
+DatabaseTable           │ dbtableid                          │ name!, aclid, errorreportcatid?
+DatabaseColumn          │ dbcolumnid                         │ name!dbtableid!, columnaclid, aclid, errorreportcatid?
+ColumnAccessControlList │ columnaclid                        │ {list, read, edit}cellrule(and/=or/overrule), acl:aclid!, aclid, errorreportcatid?
+Table                   │ tableid                            │ aclid, errorreportcatid?
+Column                  │ columnid                           │ tablecoloum!tableid!, aclid, errorreportcatid?
+ColumnDisplay           │ columndisplayid                    │ userid!columnid!, width?, position?, aclid, errorreportcatid?
+User                    │ userid                             │ username!, password[sha1hash], face:fileid?, personid?, aclid, errorreportcatid?
+UserGroup               │ usergroupid                        │ name!, aclid, errorreportcatid?
+AccessControlList       │ aclid                              │ owner:userid, group:usergroupid?, {owner, group, other}{list, read, edit}=y, aclid, errorreportcatid?
+ErrorReport             │ errorreportid                      │ isautomatic, description, summary, level, solvedate[timestamp]?, errorreportcat:errorreportcatid, aclid, errorreportcatid?
+ErrorReportCatalogue    │ errorreportcatid                   │ aclid, errorreportcatid?
+File                    │ fileid                             │ url!, size, isdeleted=n, {md5, md6, sha{1, 256, 512, 3}}sum[hash]?, fileformatid, filemetaid!, errorreportcatid?
+                        \                                    \   trackid¿pictureid¿bookid¿audiobookfileid¿episodeid¿videoclipid¿filmid??, aclid, errorreportcatid?
+FileSector              │ filesectorid                       │ url!, limit?, aclid, errorreportcatid?
+License                 │ licenseid                          │ free?, gratis?, license?, aclid, errorreportcatid?
+FileMetadata            │ filemetaid                         │ duration?, heuristicduration?, adddate[timestamp], framerate?, aclid, errorreportcatid?
+FileFormat              │ fileformatid                       │ format!, free?, aclid, errorreportcatid?
+AudioResolution         │ audioresid                         │ bitrate?, samplerate?, bitratevariationtype?, audioencodingid?, audiochannelsid?, aclid, errorreportcatid?
+AudioEncoding           │ audioencodingid                    │ name!, free?, description?, aclid, errorreportcatid?
+AudioChannels           │ audiochannelsid                    │ name!, dimensions, discants, bases, aclid, errorreportcatid?
+FrameResolution         │ frameresid                         │ width?, height?, 3Ddepth?, colourdepth?, scan?, aclid, errorreportcatid?
+ColourChannel           │ colourid                           │ name!, wavelength?, type(blend/colour/property)?, aclid, errorreportcatid?
+3DFrame                 │ 3dframeid                          │ type!, anaglyphid!?, aclid, errorreportcatid?
+AnaglyphScheme          │ anaglyphid                         │ name!, aclid, errorreportcatid?
+Person                  │ persionid                          │ name, birthday?, gender?, nationality:nationid?, aclid, errorreportcatid?
+Nation                  │ nationid                           │ nation!, nationallity!, aclid, errorreportcatid?
+Language                │ languageid                         │ language!, aclid, errorreportcatid?
+Mood                    │ moodid                             │ mood!, aclid, errorreportcatid?
+Track                   │ trackid                            │ title?, description?, tracktypeid, cover:trackid?covercomment↓?, aclid, errorreportcatid?
+TrackType               │ tracktypeid                        │ type!, aclid, errorreportcatid?
+TrackTag                │ tracktagid                         │ tag!, aclid, errorreportcatid?
+Genre                   │ genreid                            │ genre!, aclid, errorreportcatid?
+Disc                    │ discid                             │ albumid, index=1, side=1, title?, aclid, errorreportcatid?
+Group                   │ groupid                            │ name, description?, website?, aclid, errorreportcatid?
+GroupName               │ groupnameid                        │ groupid!name<most not be same as Group[groupid].name>, aclid, errorreportcatid?
+Artist                  │ artistid                           │ scenename?, aclid, errorreportcatid?
+Instrument              │ instrumentid                       │ instrument!, class?, aclid, errorreportcatid?
+Album                   │ albumid                            │ title?, releasedateid!, aclid, errorreportcatid?
+AlbumTag                │ albumtagid                         │ tag<type included>, aclid, errorreportcatid?
+ReleaseDate             │ releasedateid                      │ year?month?day?ordinal?, aclid, errorreportcatid?
+RecordCompany           │ recordcompanyid                    │ name!, aclid, errorreportcatid?
+Picture                 │ pictureid                          │ title?, description?, year?month?day?hour?minute?, picturetypeid, albumid?position?, bookid?«figureid?, comment?», aclid, errorreportcatid?
+PictureArtist           │ pictureartistid                    │ alias?, aclid, errorreportcatid?
+PictureTag              │ picturetagid                       │ tag!, aclid, errorreportcatid?
+PictureType             │ picturetypeid                      │ type!, aclid, errorreportcatid?
+PictureAlbum            │ picturealbumid                     │ title, comment?, aclid, errorreportcatid?
+PictureGenre            │ picturegenreid                     │ genre!, aclid, errorreportcatid?
+VoiceActor              │ voiceactorid                       │ role?, aclid, errorreportcatid?
+AudioBook               │ audiobookid                        │ duration?, publishdateid, aclid, errorreportcatid?
+AudioBookFile           │ audiobookfileid                    │ firstchapter?lastchapter, aclid, errorreportcatid?
+Author                  │ authorid                           │ psuedonym?, aclid, errorreportcatid?
+PublishDate             │ publishdateid                      │ year?month?day?, aclid, errorreportcatid?
+Book                    │ bookid                             │ title, isbn<we can use this to get press>?, publishdateid, bookseriesid?, aclid, errorreportcatid?
+BookTag                 │ booktagid                          │ tag!, aclid, errorreportcatid?
+BookGenre               │ bookgenreid                        │ genre!, aclid, errorreportcatid?
+BookSeries              │ bookseriesid                       │ name, aclid, errorreportcatid?
+GenericBookSeries       │ genericbookseriesid                │ name, aclid, errorreportcatid?
+Subtitles               │ subtitlesid                        │ fulltext?, trackid¿filmid¿videoclipid¿episodeid??, aclid, errorreportcatid?
+TimePeriod              │ timeperiodid                       │ starttime!endtime!, aclid, errorreportcatid?
+VideoClip               │ videoclipid                        │ name, description?, aclid, errorreportcatid?
+ClipAuthor              │ clipauthorid                       │ alias?, aclid, errorreportcatid?
+ClipGenre               │ clipgenreid                        │ genre!, aclid, errorreportcatid?
+Film                    │ filmid                             │ title, year?month?day?, description?, genericseriesid?, prequel:filmid↓?, dubon:filmid→?, aclid, errorreportcatid?
+FilmGenre               │ filmgenreid                        │ genre!, aclid, errorreportcatid?
+FilmTag                 │ filmtagid                          │ tag!, aclid, errorreportcatid?
+GenericSeries           │ genericseriesid                    │ name, aclid, errorreportcatid?
+Actor                   │ actorid                            │ role?, aclid, errorreportcatid?
+Crew                    │ crewid                             │ job?, aclid, errorreportcatid?
+Series                  │ seriesid                           │ title, description?, year?, seriestypeid, genericseriesid?, aclid, errorreportcatid?
+SeriesTag               │ seriestagid                        │ tag!, aclid, errorreportcatid?
+SeriesType              │ seriestypeid                       │ type!, aclid, errorreportcatid?
+SeriesGenre             │ seriesgenreid                      │ genre!, aclid, errorreportcatid?
+Season                  │ seasonid                           │ seriesid, index, firstyear?lastyear, title?, description?, aclid, errorreportcatid?
+SeasonTag               │ seasontagid                        │ tag!, aclid, errorreportcatid?
+Episode                 │ episodeid                          │ seasonid, index?, volumeid?, episodetypeid, disc?, firstindex?latindex, description?, year?month?day?time[time]?, airingid!?, aclid, errorreportcatid?
+EpisodeTag              │ episodetagid                       │ tag!, aclid, errorreportcatid?
+EpisodeType             │ episodetypeid                      │ type!, aclid, errorreportcatid?
+EpisodeTitle            │ episodetitleid                     │ title?, aclid, errorreportcatid?
+EpisodePart             │ episodepartid                      │ part?, aclid, errorreportcatid?
+Volume                  │ volumeid                           │ index?, title?, description?, aclid, errorreportcatid?
+IncorrectAiring         │ airingid                           │ asseason? afterdisc? afterepisode?, intendeddate[date]?, aclid, errorreportcatid?
+user_playlist           │ userid, playlistid, playlistnodeid │ name, description?, lastopened?, timesopened=0, aclid, errorreportcatid?
+track_mood              │ trackid, moodid, userid            │ aclid, errorreportcatid?
+group_artist            │ groupid, artistid?, instrumentid?  │ aclid, errorreportcatid?
+episode_part_title      │ episode{, part, title}id           │ index, aclid, errorreportcatid?
+episode_tag             │ episodeid, episodetagid            │ aclid, errorreportcatid?
+film_soundtrack         │ filmid, trackid                    │ istheme, comment?, aclid, errorreportcatid?
+episode_soundtrack      │ episodeid, trackid                 │ istheme, comment?, aclid, errorreportcatid?
+film_clip               │ filmid, videoclip                  │ aclid, errorreportcatid?
+film_actor              │ filmid, actorid                    │ aclid, errorreportcatid?
+series_actor            │ seriesid, actorid                  │ aclid, errorreportcatid?
+film_crew               │ filmid, crewid                     │ aclid, errorreportcatid?
+series_crew             │ seriesid, crewid                   │ aclid, errorreportcatid?
+user_setting            │ userid, usersettingid              │ value[blob], aclid, errorreportcatid?
+function_tested         │ userid, functionid                 │ aclid, errorreportcatid?
+user_group              │ userid, usergroupid                │ aclid, errorreportcatid?
+acl_secondary_user      │ aclid, userid                      │ list=y, read=y, edit=y, aclid, errorreportcatid?
+acl_secondary_group     │ aclid, usergroupid                 │ list=y, read=y, edit=y, aclid, errorreportcatid?
+file_license            │ fileid, licenseid                  │ aclid, errorreportcatid?
+file_sector             │ fileid, filesectorid               │ aclid, errorreportcatid?
+file_audio              │ filemetaid, audioresid             │ index, name?, aclid, errorreportcatid?
+file_frame              │ filemetaid, frameresid             │ index, aclid, errorreportcatid?
+frame_colour            │ frameresid, colourid               │ aclid, errorreportcatid?
+frame_3d                │ frameresid, 3dframeid              │ aclid, errorreportcatid?
+language_inheritance↓   │ {parent, child}(languageid)        │ aclid, errorreportcatid?
+speaks                  │ personid, languageid               │ aclid, errorreportcatid?
+track_tag               │ trackid, tracktagid                │ aclid, errorreportcatid?
+track_genre             │ trackid, genreid                   │ dominance(1–9)=5, aclid, errorreportcatid?
+genre_inheritance↓      │ {parent, child}(genreid)           │ dominance(1–9)=5, aclid, errorreportcatid?
+highly_related_group↑   │ {relater, relatee}(group)          │ aclid, errorreportcatid?
+album_recordcompany     │ albumid, recordcompanyid           │ aclid, errorreportcatid?
+album_tag               │ albumid, albumtagid                │ aclid, errorreportcatid?
+disc_track              │ discid, trackid                    │ index?, aclid, errorreportcatid?
+featured_group          │ trackid, groupid                   │ aclid, errorreportcatid?
+group_album             │ groupid, albumid                   │ index?, aclid, errorreportcatid?
+group_picture           │ groupid, pictureid                 │ comment?, aclid, errorreportcatid?
+picture_tag             │ pictureid, picturetagid            │ aclid, errorreportcatid?
+picture_artist          │ pictureid, pictureartistid         │ aclid, errorreportcatid?
+picture_album           │ pictureid, picturealbumid          │ index?, aclid, errorreportcatid?
+picture_genre           │ pictureid, picturegenreid          │ dominance(1–9)=5, aclid, errorreportcatid?
+pic_genre_inheritance↓  │ {parent, child}(picturegenreid)    │ dominance(1–9)=5, aclid, errorreportcatid?
+book_voice              │ audiobookid, voiceactorid          │ aclid, errorreportcatid?
+audiobook_file          │ audiobookid, audiobookfileid       │ index, aclid, errorreportcatid?
+book_tag                │ bookid, booktagid                  │ aclid, errorreportcatid?
+book_author             │ bookid, authorid                   │ aclid, errorreportcatid?
+book_genre              │ bookid, bookgenreid                │ dominance(1–9)=5, aclid, errorreportcatid?
+book_genre_inheritance↓ │ {parent, child}(bookid)            │ dominance(1–9)=5, aclid, errorreportcatid?
+translation→            │ {original, translation}(bookid)    │ aclid, errorreportcatid?
+highly_related_book↑    │ {relater, relatee}(bookid)         │ aclid, errorreportcatid?
+subtitle_time           │ subtitlesid, timeperiodid          │ text, colour?, isattop=n, aclid, errorreportcatid?
+clip_author             │ videoclipid, clipathorid           │ aclid, errorreportcatid?
+clip_genre              │ videoclipid, clipgenreid           │ dominance(1–9)=5, aclid, errorreportcatid?
+clip_genre_inheritance↓ │ {parent, child}(clipgenreid)       │ dominance(1–9)=5, aclid, errorreportcatid?
+related_clip↑           │ {relater, relatee}(videoclipid)    │ aclid, errorreportcatid?
+next_clip↓              │ {current, next}(videoclipid)       │ aclid, errorreportcatid?
+film_tag                │ filmid, filmtagid                  │ aclid, errorreportcatid?
+film_genre              │ filmid, filmgenreid                │ dominance(1–9)=5, aclid, errorreportcatid?
+film_genre_inheritance↓ │ {parent, child}(filmgenreid)       │ dominance(1–9)=5, aclid, errorreportcatid?
+highly_related_film↑    │ {relater, relatee}(filmgenreid)    │ aclid, errorreportcatid?
+series_tag              │ seriesid, seriestagid              │ aclid, errorreportcatid?
+series_genre            │ seriesid, seriesgenreid            │ dominance(1–9)=5, aclid, errorreportcatid?
+tv_genre_inheritance↓   │ {parent, child}(seriesgenreid)     │ dominance(1–9)=5, aclid, errorreportcatid?
+highly_related_series↑  │ {relater, relatee}(seriesid)       │ aclid, errorreportcatid?
+season_tag              │ seasonid, seasontagid              │ aclid, errorreportcatid?
+group_orgin             │ groupid, nationid                  │ aclid, errorreportcatid?
+track_language          │ trackid, languageid                │ aclid, errorreportcatid?
+subtitle_language       │ subtitleid, languageid             │ aclid, errorreportcatid?
+videoclip_language      │ videoclipid, languageid            │ aclid, errorreportcatid?
+picture_country         │ pictureid, nationid                │ aclid, errorreportcatid?
+picture_language        │ pictureid, languageid              │ aclid, errorreportcatid?
+book_origin             │ bookid, nationid                   │ aclid, errorreportcatid?
+book_language           │ bookid, languageid                 │ aclid, errorreportcatid?
+series_origin           │ seriesid, nationid                 │ aclid, errorreportcatid?
+series_language         │ seriesid, languageid               │ aclid, errorreportcatid?
+film_origin             │ filmid, nationid                   │ aclid, errorreportcatid?
+film_language           │ filmid, languageid                 │ aclid, errorreportcatid?
+series_crossover        │ episodeid, seriesid                │ comment?, aclid, errorreportcatid?
+artist_person           │ artistid, personid                 │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+picture_artist_person   │ pictureartistid, personid          │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+voice_actor_person      │ voiceactorid, personid             │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+author_person           │ authorid, personid                 │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+clip_author_person      │ clipauthorid, personid             │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+actor_person            │ actorid, personid                  │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+crew_person             │ crewid, personid                   │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+track_user              │ trackid, personid                  │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+group_user              │ groupid, personid                  │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+album_user              │ albumid, personid                  │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+picture_user            │ pictureid, personid                │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+audio_book_user         │ audiobookid, personid              │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+book_user               │ bookid, personid                   │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+book_genre_user         │ bookgenreid, personid              │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+book_series_user        │ bookseriesid, personid             │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+episode_user            │ episodeid, personid                │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+volumn_user             │ volumnid, personid                 │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+season_user             │ seasonid, personid                 │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+series_user             │ seriesid, personid                 │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+series_genre_user       │ seriesgenreid, personid            │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+video_clip_user         │ videoclipid, personid              │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+clip_genre_user         │ clipgenreid, personid              │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+film_user               │ filmid, personid                   │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+film_genre_user         │ filmgenreid, personid              │ rating(−4–4)?, lastplayed[timestamp]?, timesplayed=0, favourlevel(−2–/2)=0, aclid, errorreportcatid?
+playlist_track          │ playlistid, trackid                │ index, aclid, errorreportcatid?
+playlist_picture        │ playlistid, pictureid              │ index, aclid, errorreportcatid?
+playlist_book           │ playlistid, bookid                 │ index, aclid, errorreportcatid?
+playlist_audio_book     │ playlistid, audiobookfileid        │ index, aclid, errorreportcatid?
+playlist_episode        │ playlistid, episodeid              │ index, aclid, errorreportcatid?
+playlist_videoclip      │ playlistid, videoclipid            │ index, aclid, errorreportcatid?
+playlist_film           │ playlistid, filmid                 │ index, aclid, errorreportcatid?
+
