@@ -1,0 +1,198 @@
+###  Coding style for Java and C  ###
+=====================================
+
+
+Indention and curly brackets
+----------------------------
+
+Indention is 4 characters; if possible you must uses blank
+spaces and not tabs spaces.
+
+Curly brackets are only used syntax requires it, when the all
+other alternatives in an if-statement with many alternatives
+have it, and as stand alone blocks (without if, while or alike)
+is used for clarity, or when switch cases whould otherwise have
+variable name conflictions.
+
+One line if:s, while:s, do..while:s and for:s do no uses curly
+brackets. This is also applied when the only instructions is a
+block (another if, while or alike).
+
+Curly brackets are put on seperate lines, but if it is for, and
+only for, a method, an if, a for (including enhanced for) or a
+while (excluding do..while), the open curly brackets are put,
+iff it improves readability, on the same line has the head when
+one space between. The interior of the block must be at most
+four instructions with no blank lines.
+main and constructors does not qualify as methods in this case.
+
+Multiplie if:s or, but not and, multiple else if:s you that
+have to must two instructions, the if:s and else if:s should be
+put on one compressed line each, with two spaces between, heads
+curly brackets and instructions, in a tabular view.
+This include the else part iff there is only one if.
+
+
+
+The do..while:s
+---------------
+
+The while in a do..while is put on a separate line with two
+extra spaces in the indention.
+
+        do			do
+        {			    ....
+            ....		  while
+        }
+          while (...);
+
+
+
+else if:s
+---------
+
+else if are normally handled as one keyword with exactly one
+space between else and if, but if it feels logical the if is
+handled as the interior of the else, and put on the next line
+with one more indention.
+
+
+
+switch:es
+---------
+
+The case:s in swiches are indented, and their interior is
+further indented. The default is put in the end and just
+another case. Fall throughs must be commented with
+
+        //FALL THROUGH
+
+A blank line, or the end if the switch, must be put after
+the break in the end of a case.
+
+
+
+forever:s
+---------
+
+forever is repsented by for(;;), not by while (true).
+
+
+
+final:s
+-------
+
+All unexchangeable variables must be final, this includes
+all method and constructor parameters.
+
+
+
+Element order
+-------------
+
+The following are the order body elements, they are
+separated by three lines. Only one non-enclosed class,
+enum, interface or annotation may be put in one file.
+
+Enum vales
+
+     Each end with a comma, and subclassing is not encuraged.
+     If the enum has more then just values, a semicolon is
+     used instead of the lasts values enum, in the same place.
+
+Constants, in accessibility order (static final)
+
+    Constants have one blank line between them, and can
+    be groups; groups have two blank lined between them.
+    Value setting help variables are put in beginning of
+    the groups.
+
+Type initialisers
+
+    The documentation for these must have
+    
+	Type initialiser
+    
+    as the first paragraph.
+    You may have multiple type initialisers.
+
+Constructors
+
+    The documentation for these must have
+    
+	Constructor
+    
+    as the first paragraph.
+    
+    If you rather keep the default constructor you must
+    have the comment
+
+    	//Has default constructor
+
+    in the contructors place.
+    
+    If class uses a private default constructor instead
+    of the public default constructor, the constructor
+    
+        /**
+         * Constructor
+         */
+	private ClassName()
+        {
+            //Privatise default contructor
+        }
+
+    is added. If the class does not have instances
+    the constructor
+    
+        /**
+         * Non-constructor
+         */
+	private ClassName()
+        {
+            assert false : "You may not create instances of this class [ClassName].";
+        }
+
+    is added.
+    
+Singleton/multiton implemenetation: constructor, getInstance, instance/instance map.
+
+Initialisers
+
+    The documentation for these must have
+    
+	Initialiser
+    
+    as the first paragraph.
+    You may have multiple initialisers.
+
+Main method
+     
+    public static void main(final String... args)
+
+Other static variables
+
+Non-static variables
+
+    Only final variables may be public.
+
+Static methods
+
+Non-static methods
+
+Inner classes, enums, interfaces
+
+    Annotations should be in sperate files.
+
+Getters and settes
+
+Static methods
+
+Non-static methods
+
+Main method for tests
+     
+    public static void main(final String... args)
+
+Everthing above with the same layout, but is used only for tests.
+
