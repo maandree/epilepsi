@@ -14,23 +14,33 @@ have it, and as stand alone blocks (without if, while or alike)
 is used for clarity, or when switch cases whould otherwise have
 variable name conflictions.
 
-One line if:s, while:s, do..while:s and for:s do no uses curly
+One line if:s, while:s, do..while:s and for:s does not use curly
 brackets. This is also applied when the only instructions is a
 block (another if, while or alike).
 
 Curly brackets are put on seperate lines, but if it is for, and
 only for, a method, an if, a for (including enhanced for) or a
-while (excluding do..while), the open curly brackets are put,
-iff it improves readability, on the same line has the head when
-one space between. The interior of the block must be at most
-four instructions with no blank lines.
-main and constructors does not qualify as methods in this case.
+while (excluding do..while), the open curly brackets are put, iff
+it improves readability, on the same line has the first statement;
+we will call this compressed bracket use. The interior of the
+block must be at most four instructions with no blank lines. main
+and constructors does not qualify as methods in this case.
 
-Multiplie if:s or, but not and, multiple else if:s you that
-have to must two instructions, the if:s and else if:s should be
-put on one compressed line each, with two spaces between, heads
-curly brackets and instructions, in a tabular view.
-This include the else part iff there is only one if.
+Multiplie if:s or, but not and, multiple else if:s you that have
+to must two instructions, the if:s and else if:s should be put on
+one compressed line each, with two spaces between, heads curly
+brackets and instructions, in a tabular view. This include the
+else part iff there is only one if.
+
+This is how compressed bracket use look:
+
+        public void doWait()
+	{   synchronized (this.monitor)
+	    {    this.monitor.wait();
+	}   }
+
+Notice, which was not mentioned, that the closing brackets, in
+compressed bracket use, are put on the same line if possible.
 
 
 
