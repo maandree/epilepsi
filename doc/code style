@@ -1,9 +1,10 @@
-###  Coding style for Java and C  ###
-=====================================
+-*- outline -*-
 
 
-Indention and curly brackets
-----------------------------
+***  Coding style for Java and C ***
+
+
+* Indention and curly brackets *
 
 Indention is 4 characters; if possible you must uses blank
 spaces and not tabs spaces. This is default in GNU Emacs.
@@ -44,8 +45,7 @@ compressed bracket use, are put on the same line if possible.
 
 
 
-The do..while:s
----------------
+* The do..while:s *
 
 The while in a do..while is put on a separate line with two
 extra spaces in the indention.
@@ -58,8 +58,7 @@ extra spaces in the indention.
 
 
 
-else if:s
----------
+* else if:s *
 
 else if are normally handled as one keyword with exactly one
 space between else and if, but if it feels logical the if is
@@ -68,8 +67,7 @@ with one more indention.
 
 
 
-switch:es
----------
+* switch:es *
 
 The case:s in swiches are indented, and their interior is
 further indented. The default is put in the end and just
@@ -82,23 +80,20 @@ the break in the end of a case.
 
 
 
-forever:s
----------
+* forever:s *
 
 forever is repsented by for(;;), not by while (true).
 
 
 
-final:s
--------
+* final:s *
 
 All unexchangeable variables must be final, this includes
 all method and constructor parameters.
 
 
 
-Element order
--------------
+* Element order *
 
 The following are the order body elements, they are
 separated by three lines. Only one non-enclosed class,
@@ -208,8 +203,7 @@ enum, interface or annotation may be put in one file.
 
 
 
-final:s and try:s
------------------
+* final:s and try:s *
 
 This mostly conserns final variables that are assinged in try-blocks,
 but can be used anywhere.
@@ -237,8 +231,7 @@ use the code blocked below:
 
 
 
-new:s, cast:s and in-line assignments
--------------------------------------
+* new:s, cast:s and in-line assignments *
 
 As seen in the previous section, anonymous objects are encapsulated
 in round brackets. With anonymous objects we mean objects that
@@ -268,8 +261,7 @@ wants to store the File object for "/dev/stdout", we use this code:
 
 
 
-Connectives
------------
+* Connectives *
 
 If the order of the operands is fatal, but it does not have to do
 with null or boundary check, or is not otherwise clearly visible
@@ -308,8 +300,7 @@ the higher up, the more likely to be the syntax of choice:
 
 
 
-Events and errors
------------------
+* Events and errors *
 
 Event parameters, such is the listener for GUI:s, should be named 'e'
 iff it is the only parameter.
@@ -322,8 +313,7 @@ These four names are only allowed in this cases.
 
 
 
-Compact switch:es
------------------
+* Compact switch:es *
 
 switch:es containing six or more simple cases (one alternatice), no
 multichoice cases and optionally a default, may be compact. It should
@@ -339,8 +329,7 @@ default is written as normally.
 
 
 
-import:s and package:s
-----------------------
+* import:s and package:s *
 
 Order:
 
@@ -376,8 +365,7 @@ with the comment:
 
 
 
-Documentation
--------------
+* Documentation *
 
 {@inheritDoc} should be used if you have nothing good to say,
 and the method is inherited from an interface or a superclass.
