@@ -36,6 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 package se.kth.maandree.epilepsi.io;
+import java.io.*;
 //package java.io;
 
 // NOTE: This implementation is very similar to that of PipedInputStream. 

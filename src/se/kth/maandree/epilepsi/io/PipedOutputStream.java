@@ -37,6 +37,7 @@ exception statement from your version. */
 
 
 package se.kth.maandree.epilepsi.io;
+import java.io.*;
 //package java.io;
 
 // NOTE: This implementation is very similar to that of PipedWriter.  If you 

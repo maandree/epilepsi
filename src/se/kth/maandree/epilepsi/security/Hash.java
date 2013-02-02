@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public se.kth.maandree.epilepsi.security;
+package se.kth.maandree.epilepsi.security;
 
 import java.io.*;
 
@@ -33,8 +33,10 @@ abstract class Hash
      * 
      * @param   message  The message
      * @return           The checksum
+     * 
+     * @throws  IOException  On I/O error
      */
-    public byte[] calculate(final String message)
+    public byte[] calculate(final String message) throws IOException
     {
 	return this.calculate(message.getBytes("UTF-8"));
     }
@@ -44,8 +46,10 @@ abstract class Hash
      * 
      * @param   message  The message
      * @return           The checksum
+     * 
+     * @throws  IOException  On I/O error
      */
-    public byte[] calculate(final byte[] message)
+    public byte[] calculate(final byte[] message) throws IOException
     {
 	return calculate(new InputStream()
 	    {
@@ -57,11 +61,12 @@ abstract class Hash
 		/**
 		 * @{inheritDoc}
 		 */
-		int read()
+		@Override
+		public int read() throws IOException
 		{
 		    if (this.ptr == message.length)
 			return -1;
-		    return messaeg[this.ptr++] & 255;
+		    return message[this.ptr++] & 255;
 		}
 	    });
     }
@@ -71,8 +76,10 @@ abstract class Hash
      * 
      * @param   message  The message
      * @return           The checksum
+     * 
+     * @throws  IOException  On I/O error
      */
-    public abstract byte[] calculate(final InputStream message);
+    public abstract byte[] calculate(final InputStream message) throws IOException;
     
 }
 

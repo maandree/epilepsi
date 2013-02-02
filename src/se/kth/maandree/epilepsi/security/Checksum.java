@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public se.kth.maandree.epilepsi.security;
+package se.kth.maandree.epilepsi.security;
+
+import java.io.*;
 
 /* TODO support for SHA2-224 */
 /* TODO support for SHA3-{25,50,100,200,400,800,1600} */
@@ -46,7 +48,7 @@ public class Checksum
 	    case "sha2-384":  this.hash = new SHA2(384);  break;
 	    case "sha2-512":  this.hash = new SHA2(512);  break;
 	    default:
-		throw Error("Checksum: " + algorithm + " is not support, did you test with isSupported?");
+		throw new Error("Checksum: " + algorithm + " is not support, did you test with isSupported?");
 	}
     }
     
@@ -84,8 +86,10 @@ public class Checksum
      * 
      * @param   message  The message
      * @return           The checksum
+     * 
+     * @throws  IOException  On I/O error
      */
-    public byte[] calculate(final String message)
+    public byte[] calculate(final String message) throws IOException
     {   return this.hash.calculate(message);
     }
     
@@ -94,8 +98,10 @@ public class Checksum
      * 
      * @param   message  The message
      * @return           The checksum
+     * 
+     * @throws  IOException  On I/O error
      */
-    public byte[] calculate(final byte[] message)
+    public byte[] calculate(final byte[] message) throws IOException
     {   return this.hash.calculate(message);
     }
     
@@ -104,8 +110,10 @@ public class Checksum
      * 
      * @param   message  The message
      * @return           The checksum
+     * 
+     * @throws  IOException  On I/O error
      */
-    public byte[] calculate(final InputStream message)
+    public byte[] calculate(final InputStream message) throws IOException
     {   return this.hash.calculate(message);
     }
 

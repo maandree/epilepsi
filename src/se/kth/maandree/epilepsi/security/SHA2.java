@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public se.kth.maandree.epilepsi.security;
+package se.kth.maandree.epilepsi.security;
 
 import java.io.*;
-import java.security.MessageDigest;
+import java.security.*;
 
 
 /**
@@ -43,7 +43,12 @@ class SHA2 extends Hash
      */
     public SHA2(final int bits)
     {
-	this.digest = MessageDigest.getInstance("SHA-" + Integer.toString(bits));
+	try
+	{   this.digest = MessageDigest.getInstance("SHA-" + Integer.toString(bits));
+	}
+	catch (final NoSuchAlgorithmException err)
+	{   throw new Error("What the buck of a bootclasspath are you running?");
+	}
     }
     
     
@@ -61,15 +66,13 @@ class SHA2 extends Hash
     
     
     /**
-     * Calculate the checksum of a message
-     * 
-     * @param   message  The message
-     * @return           The checksum
+     * @{inheritDoc}
      */
-    public byte[] calculate(final byte[] message)
+    @Override
+    public byte[] calculate(final byte[] message) throws IOException
     {
 	try
-	{   this.digest.digest(message);
+	{   return this.digest.digest(message);
 	}
 	finally
 	{   this.digest.reset();
@@ -77,12 +80,9 @@ class SHA2 extends Hash
     }
     
     /**
-     * Calculate the checksum of a message
-     * 
-     * @param   message  The message
-     * @return           The checksum
+     * @{inheritDoc}
      */
-    public byte[] calculate(final InputStream message)
+    public byte[] calculate(final InputStream message) throws IOException
     {
 	try
 	{   for (int n;;)
