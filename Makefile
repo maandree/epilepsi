@@ -24,6 +24,7 @@ JAVA_LIBS=$$(echo lib/*.jar | sed -e 's_ _:_g')
 
 
 all:
+	echo $(CARCH)
 	mkdir -p bin
 	if [ -d lib ] && [ ! $$(find lib | grep '.\.jar$$' | wc -l) = 0]; then  \
 	  $(JAVAC) $(JAVA_FLAGS) -cp src:$(JAVA_LIBS) $(JAVA_FILES);            \
