@@ -10,6 +10,7 @@
 # (GNU All Permissive License)
 
 
+JAVA=java7
 JAVAC=javac7
 
 JAVA_DEBUG=-g
@@ -29,6 +30,10 @@ all:
 	else                                                                    \
 	  $(JAVAC) $(JAVA_FLAGS) -cp src $(JAVA_FILES);                         \
 	fi
+
+
+test-checksum:
+	$(JAVA) -cp bin test.ChecksumTest
 
 
 .PHONY: clean
