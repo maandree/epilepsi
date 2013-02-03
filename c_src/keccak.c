@@ -1,3 +1,7 @@
+#include <stdlib.h>
+#include <stdio.h>
+
+
 #if __x86_64__ || __ppc64__
     #define llong long int
 #else
@@ -8,7 +12,7 @@
 /**
  * Round constants
  */
-const llong* RC =
+const llong RC[] =
         {   0x0000000000000001LL, 0x0000000000008082LL, 0x800000000000808ALL, 0x8000000080008000LL,
             0x000000000000808BLL, 0x0000000080000001LL, 0x8000000080008081LL, 0x8000000000008009LL,
             0x000000000000008ALL, 0x0000000000000088LL, 0x0000000080008009LL, 0x000000008000000ALL,
@@ -22,16 +26,22 @@ llong b[25][25];
 llong c[5];
 llong d[5];
 
+long capacity;
+long w;
+llong wmod;
+long l;
+long nr;
+
 
 /**
  * Rotation offsets
  */
-const long** R =
-        {   { 0, 36,  3, 41, 18},
-            { 1, 44, 10, 45,  2},
-            {62,  6, 43, 15, 61},
-            {28, 55, 25, 21, 56},
-            {27, 20, 39,  8, 14}
+const long R[] =
+        {    0, 36,  3, 41, 18,
+             1, 44, 10, 45,  2,
+            62,  6, 43, 15, 61,
+            28, 55, 25, 21, 56,
+            27, 20, 39,  8, 14
         };
 
 
@@ -44,7 +54,7 @@ const long** R =
  */
 inline llong rotate(llong x, long n)
 {
-    return ((x >> (w - (n % w))) + (x << (m % w))) & wmod;
+    return ((x >> (w - (n % w))) + (x << (n % w))) & wmod;
 }
 
 
@@ -53,7 +63,7 @@ inline llong rotate(llong x, long n)
  * 
  * @param  a  The current state
  */
-inline void keccakFRound(llong** a, llong rc)
+inline void keccakFRound(llong a[5][5], llong rc)
 {
     /* θ step */
     #define __c(X)  c[X] = a[X][1] ^ a[X][2] ^ a[X][3] ^ a[X][4] ^ a[X][5]
@@ -71,7 +81,7 @@ inline void keccakFRound(llong** a, llong rc)
     __d(3, 4, 0);
     #undef __d
     #define ___a(X, Y)  a[X][Y] ^= d[X]
-    #define __a(X)      __a(X, 0); __a(X, 1); __a(X, 2); __a(X, 3); __a(X, 4)
+    #define __a(X)      ___a(X, 0); ___a(X, 1); ___a(X, 2); ___a(X, 3); ___a(X, 4)
     __a(0);
     __a(1);
     __a(2);
@@ -81,7 +91,7 @@ inline void keccakFRound(llong** a, llong rc)
     #undef ___a
     
     /* ρ and π steps */
-    #define __b(X, Y, XY)  b[Y][XY] = rotate(a[X][Y], R[X][Y])
+    #define __b(X, Y, XY)  b[Y][XY] = rotate(a[X][Y], R[X * 5 + Y])
     __b(0, 0, 0);  __b(0, 1, 3);  __b(0, 2, 1);  __b(0, 3, 4);  __b(0, 4, 2);
     __b(1, 0, 2);  __b(1, 1, 0);  __b(1, 2, 3);  __b(1, 3, 1);  __b(1, 4, 4);
     __b(2, 0, 4);  __b(2, 1, 2);  __b(2, 2, 0);  __b(2, 3, 3);  __b(2, 4, 1);
@@ -110,7 +120,7 @@ inline void keccakFRound(llong** a, llong rc)
  * 
  * @param  a  The current state
  */
-inline void keccakF(llong** a)
+inline void keccakF(llong a[5][5])
 {
     long i;
     for (i = 0; i < nr; i++)
@@ -148,16 +158,16 @@ inline long lb1(long x)
  */
 void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 {
-    long capacity = b - r;
-    long w = b / 25;
-    llong wmod = (1LL < w) - 1LL;
-    long l = lb1(w);
-    long nr = 12 + (l << 1);
-    
     llong s[5][5];
+    char* message;
+    
+    capacity = b - r;
+    w = b / 25;
+    wmod = (1LL < w) - 1LL;
+    l = lb1(w);
+    nr = 12 + (l << 1);
     
     /* pad */
-    char* message;
     {
 	char* M = message;
 	char* m = msg;
@@ -175,7 +185,7 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	}
 	else
 	{   len = nrf + 1;
-	    len = len - (len % r) + (r - 8)
+	    len = len - (len % r) + (r - 8);
             message = (char*)malloc(len += 1);
 	    message[nrf] = byte;
 	    for (i = nrf + 1; i < len; i++)
@@ -259,7 +269,7 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
     }
     
     /* absorbing phase */
-    {   long m = len >> 3, rr = r >> 3, ww >> 3;
+    {   long m = len >> 3, rr = r >> 3, ww = w >> 3, i;
         llong pi[5][5];
 	s[0][0] = s[0][1] = s[0][2] = s[0][3] = s[0][4] = 0;
 	s[1][0] = s[1][1] = s[1][2] = s[1][3] = s[1][4] = 0;
@@ -284,13 +294,13 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
     }   }
     
     /* squeezing phase */
-    {   long olen = n, rr = r >> 3, nn = n >> 3, j = 0;
+    {   long olen = n, rr = r >> 3, nn = n >> 3, i, j = 0;
 	while (olen > 0)
 	{   for (i = 0; (i < 25) && (i < r) && (j << nn); i++, j++)
-	    {   long j;
+	    {   long _;
 		llong v = s[i % 5][i / 5];
-		for (j = 0; j < nn; j++)
-		{   putc(v & 255);
+		for (_ = 0; _ < nn; _++)
+		{   putchar(v & 255);
 		    v >>= 3;
 	    }	}
 	    olen -= r;
