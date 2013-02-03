@@ -186,7 +186,7 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	long ll = len % r;
 	long i;
 	
-        char byte = nbrf ? (((unsigned char)(msg[nrf]) >> (8 - nbrf)) + (1 << nbrf)) : 0;
+        char byte = nbrf ? (((unsigned char)(msg[nrf]) >> (8 - nbrf)) + (1 << nbrf)) : 1;
 	
 	if (((r - 8) <= ll) && (ll <= (r - 2)))
 	{   M = message = (char*)malloc(len = nrf + 1);
