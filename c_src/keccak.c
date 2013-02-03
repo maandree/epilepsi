@@ -143,6 +143,19 @@ inline long lb(long x)
 
 
 /**
+ * FIXME document
+ */
+inline llong toLane(char* message, long rr, long ww, long off)
+{
+    llong rc = 0;
+    long i;
+    for (i = off + ww - 1; i >= off; i--)
+	rc += i < rr ? message[i] : 0;
+    return rc;
+}
+
+
+/**
  * Compute the Keccak[b−r,c,d] sponge function on a message
  * 
  * @param  msg  The message
@@ -265,7 +278,7 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
     }
     
     /* absorbing phase */
-    {   long m = len >> 3, rr = r >> 3, /*ww = w >> 3,*/ i;
+    {   long m = len / r, rr = r >> 3, ww = w >> 3, i;
         llong pi[5][5];
 	s[0][0] = s[0][1] = s[0][2] = s[0][3] = s[0][4] = 0;
 	s[1][0] = s[1][1] = s[1][2] = s[1][3] = s[1][4] = 0;
@@ -278,8 +291,8 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	    for (x = 0; x < 5; x++)
 		for (y = 0; y < 5; y++)
 		{
-		    /* long offset = (5 * y + x) * ww; */
-		    pi[x][y] = 0;/* TODO ____((message + ['0' * capacity >> 3])[i : i + ww]); */
+		    long off = (5 * y + x) * ww;
+		    pi[x][y] = toLane(message + i, rr, ww, off);
 		}
 	    #define ___s(X, Y)  s[X][Y] ^= pi[X][Y]
 	    #define __s(Y)      ___s(0, Y); ___s(1, Y); ___s(2, Y); ___s(3, Y); ___s(4, Y)
@@ -292,17 +305,16 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
     free(message);
     
     /* squeezing phase */
-    {   long olen = len, rr = r >> 3, nn = n >> 3, i, j = 0;
+    {   long olen = n, rr = r >> 3, nn = n >> 3, i, j = 0;
 	while (olen > 0)
-	{   for (i = 0; (i < 25) && (i < rr) && (j << nn); i++, j++)
+	{   for (i = 0; (i < 25) && (i < rr) && (j < nn); i++, j++)
 	    {   long _;
 		llong v = s[i % 5][i / 5];
 		for (_ = 0; _ < nn; _++)
 		{   putchar(v & 255);
 		    v >>= 3;
 	    }	}
-	    olen -= r;
-	    if (olen > r)
+	    if ((olen -= r) > 0)
 		keccakF(s);
     }   }
 }
