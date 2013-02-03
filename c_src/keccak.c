@@ -13,12 +13,12 @@
  * Round constants
  */
 const llong RC[] =
-        {   0x0000000000000001LL, 0x0000000000008082LL, 0x800000000000808ALL, 0x8000000080008000LL,
-            0x000000000000808BLL, 0x0000000080000001LL, 0x8000000080008081LL, 0x8000000000008009LL,
-            0x000000000000008ALL, 0x0000000000000088LL, 0x0000000080008009LL, 0x000000008000000ALL,
-            0x000000008000808BLL, 0x800000000000008BLL, 0x8000000000008089LL, 0x8000000000008003LL,
-            0x8000000000008002LL, 0x8000000000000080LL, 0x000000000000800ALL, 0x800000008000000ALL,
-	    0x8000000080008081LL, 0x8000000000008080LL, 0x0000000080000001LL, 0x8000000080008008LL
+        {   0x0000000000000001, 0x0000000000008082, 0x800000000000808A, 0x8000000080008000,
+            0x000000000000808B, 0x0000000080000001, 0x8000000080008081, 0x8000000000008009,
+            0x000000000000008A, 0x0000000000000088, 0x0000000080008009, 0x000000008000000A,
+            0x000000008000808B, 0x800000000000008B, 0x8000000000008089, 0x8000000000008003,
+            0x8000000000008002, 0x8000000000000080, 0x000000000000800A, 0x800000008000000A,
+	    0x8000000080008081, 0x8000000000008080, 0x0000000080000001, 0x8000000080008008
         };
 
 
@@ -160,16 +160,17 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 {
     llong s[5][5];
     char* message;
+    llong one = 1;
     
     capacity = b - r;
     w = b / 25;
-    wmod = (1LL < w) - 1LL;
+    wmod = (one < w) - one;
     l = lb1(w);
     nr = 12 + (l << 1);
     
     /* pad */
     {
-	char* M = message;
+	char* M;
 	char* m = msg;
 	
 	long nrf = len >> 3;
@@ -180,17 +181,17 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
         char byte = nbrf ? (((unsigned char)(msg[nrf]) >> (8 - nbrf)) + (1 << nbrf)) : 0;
 	
 	if (((r - 8) <= ll) && (ll <= (r - 2)))
-	{   message = (char*)malloc(len = nrf + 1);
+	{   M = message = (char*)malloc(len = nrf + 1);
 	    message[nrf] = byte + 128;
 	}
 	else
 	{   len = nrf + 1;
 	    len = len - (len % r) + (r - 8);
-            message = (char*)malloc(len += 1);
+            M = message = (char*)malloc(len += 1);
 	    message[nrf] = byte;
 	    for (i = nrf + 1; i < len; i++)
 	      message[i] = 0;
-	    message[len - 1] = 128;
+	    message[len - 1] = -128;
 	}
 	
 	#define __(X)   *(M + X) = *(m + X)
@@ -269,7 +270,7 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
     }
     
     /* absorbing phase */
-    {   long m = len >> 3, rr = r >> 3, ww = w >> 3, i;
+    {   long m = len >> 3, rr = r >> 3, /*ww = w >> 3,*/ i;
         llong pi[5][5];
 	s[0][0] = s[0][1] = s[0][2] = s[0][3] = s[0][4] = 0;
 	s[1][0] = s[1][1] = s[1][2] = s[1][3] = s[1][4] = 0;
@@ -282,8 +283,8 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	    for (x = 0; x < 5; x++)
 		for (y = 0; y < 5; y++)
 		{
-		    long offset = (5 * y + x) * ww;
-		    pi[x][y] = 0;// TODO ____((message + ['0' * capacity >> 3])[i : i + ww]);
+		    /* long offset = (5 * y + x) * ww; */
+		    pi[x][y] = 0;/* TODO ____((message + ['0' * capacity >> 3])[i : i + ww]); */
 		}
 	    #define ___s(X, Y)  s[X][Y] ^= pi[X][Y]
 	    #define __s(Y)      ___s(0, Y); ___s(1, Y); ___s(2, Y); ___s(3, Y); ___s(4, Y)
@@ -293,10 +294,12 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	    keccakF(s);
     }   }
     
+    free(message);
+    
     /* squeezing phase */
-    {   long olen = n, rr = r >> 3, nn = n >> 3, i, j = 0;
+    {   long olen = len, rr = r >> 3, nn = n >> 3, i, j = 0;
 	while (olen > 0)
-	{   for (i = 0; (i < 25) && (i < r) && (j << nn); i++, j++)
+	{   for (i = 0; (i < 25) && (i < rr) && (j << nn); i++, j++)
 	    {   long _;
 		llong v = s[i % 5][i / 5];
 		for (_ = 0; _ < nn; _++)
@@ -307,5 +310,16 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	    if (olen > r)
 		keccakF(s);
     }   }
+}
+
+
+int main(int argc, char** argv)
+{
+    (void) argc;
+    (void) argv;
+    
+    keccak("", 0, 1600, 576, 1024);
+    
+    return 0;
 }
 

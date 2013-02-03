@@ -21,6 +21,13 @@ JAVA_FLAGS=$(JAVA_DEBUG) $(JAVA_WARN) $(JAVA_DIRS)
 JAVA_FILES=$$(find src | grep '.\.java$$')
 JAVA_LIBS=$$(echo lib/*.jar | sed -e 's_ _:_g')
 
+C_DEBUG=-g
+C_WARN=-Wall -Wextra -pedantic
+CFLAGS=$(C_DEBUG) $(C_WARN)
+CPPFLAGS=
+LDFLAGS=
+C_FALGS=$(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
+
 
 
 all: java c
@@ -35,7 +42,7 @@ java:
 
 
 c:
-	gcc -o bin/keccak c_src/keccak.c
+	$(CC) $(C_FALGS) -o bin/keccak c_src/keccak.c
 
 
 test-checksum:
