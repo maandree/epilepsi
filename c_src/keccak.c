@@ -33,9 +33,11 @@ const long R[] =
         };
 
 
-llong b[25][25];
-llong c[5];
-llong d[5];
+llong** b;
+llong* c;
+llong* d;
+llong** s;
+llong* msg_i;
 
 long capacity;
 long w;
@@ -77,7 +79,7 @@ inline long lb(long x)
  * 
  * @param  a  The current state
  */
-inline void keccakFRound(llong a[5][5], llong rc)
+inline void keccakFRound(llong** a, llong rc)
 {
     /* θ step */
     #define __c(X)  c[X] = a[X][0] ^ a[X][1] ^ a[X][2] ^ a[X][3] ^ a[X][4]
@@ -134,7 +136,7 @@ inline void keccakFRound(llong a[5][5], llong rc)
  * 
  * @param  a  The current state
  */
-inline void keccakF(llong a[5][5])
+inline void keccakF(llong** a)
 {
     long i;
     for (i = 0; i < nr; i++)
@@ -146,17 +148,20 @@ inline void keccakF(llong a[5][5])
  * Convert a chunk of char:s to a long long
  * 
  * @param   message  The message
+ * @param   len      The length of the message (after the pretruncation)
  * @param   rr       Bitrate in bytes
  * @param   ww       w in bytes
  * @param   off      The offset in the message
  * @return           Lane
  */
-inline llong toLane(char* message, long rr, long ww, long off)
+inline llong toLane(char* message, long len, long rr, long ww, long off)
 {
     llong rc = 0;
     long i;
     for (i = off + ww - 1; i >= off; i--)
-	rc = (rc << 8) | (i < rr ? message[i] : 0);
+    {   rc <<= 8;
+	rc |= ((i < rr) && (i < len)) ? ((llong)(message[i]) & 255) : 0;
+    }
     return rc;
 }
 
@@ -172,7 +177,6 @@ inline llong toLane(char* message, long rr, long ww, long off)
  */
 void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 {
-    llong s[5][5];
     char* message;
     llong one = 1;
     
@@ -199,8 +203,8 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	    message[nrf] = byte ^ -128;
 	}
 	else
-	{   len = nrf + 1;
-	    len = len - (len % r) + (r - 8);
+	{   len = (nrf + 1) << 3;
+	    len = (len - (len % r) + (r - 8)) >> 3;
             M = message = (char*)malloc(len += 1);
 	    message[nrf] = byte;
 	    for (i = nrf + 1; i < len; i++)
@@ -228,6 +232,7 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 		       __(0x68); __(0x69); __(0x6A); __(0x6B); __(0x6C); __(0x6D); __(0x6E); __(0x6F);  \
 		       __(0x70); __(0x71); __(0x72); __(0x73); __(0x74); __(0x75); __(0x76); __(0x77);  \
 		       __(0x78); __(0x79); __(0x7A); __(0x7B); __(0x7C); __(0x7D); __(0x7E); __(0x7F)
+	/*
 	if ((nrf & 15))
 	{   if ((nrf & 1))
 	    {   __0();
@@ -270,6 +275,9 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	    M += 128;
 	    m += 128;
 	}
+	*/
+	for (i = 0; i < nrf; i++)
+	    *M++ = *m++;
 	#undef __7
 	#undef __6
 	#undef __5
@@ -284,29 +292,25 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
     }
     
     /* absorbing phase */
-    {   long m = len / r, rr = r >> 3, ww = w >> 3, i;
-        llong msg_i[5][5];
-	s[0][0] = s[0][1] = s[0][2] = s[0][3] = s[0][4] = 0;
+    {   long m = len >> 3, rr = r >> 3, ww = w >> 3, i;
+        s[0][0] = s[0][1] = s[0][2] = s[0][3] = s[0][4] = 0;
 	s[1][0] = s[1][1] = s[1][2] = s[1][3] = s[1][4] = 0;
 	s[2][0] = s[2][1] = s[2][2] = s[2][3] = s[2][4] = 0;
 	s[3][0] = s[3][1] = s[3][2] = s[3][3] = s[3][4] = 0;
 	s[4][0] = s[4][1] = s[4][2] = s[4][3] = s[4][4] = 0;
 	
-	for (i = 0; i < m; i += rr)
-	{   long x, y;
-	    for (y = 0; y < 5; y++)
-	        for (x = 0; x < 5; x++)
-		{
-		    long off = (5 * y + x) * ww;
-		    msg_i[x][y] = toLane(message + i, rr, ww, off);
-		}
-	    #define ___s(X, Y)  s[X][Y] ^= msg_i[X][Y]
+	for (i = 0; i < len; i += rr)
+	{   long j;
+	    for (j = 0; j < 25; j++)
+		msg_i[j] = toLane(message + i, m - i, rr, ww, j * ww);
+	    #define ___s(X, Y)  s[X][Y] ^= msg_i[X + Y * 5]
 	    #define __s(Y)      ___s(0, Y); ___s(1, Y); ___s(2, Y); ___s(3, Y); ___s(4, Y)
 	    __s(0); __s(1); __s(2); __s(3); __s(4);
 	    #undef __s
 	    #undef ___s
 	    keccakF(s);
-    }   }
+	}
+    }
     
     free(message);
     
@@ -326,16 +330,37 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 }
 
 
-int main(int argc, char** argv)
+int main(/*int argc, char** argv*/)
 {
     long output  =  512;
     long total   = 1600;
     long bitrate = total - (output << 1);
+    long i;
+    
+    
+    b = (llong**)malloc(5 * sizeof(llong*));
+    s = (llong**)malloc(5 * sizeof(llong*));
+    for (i = 0; i < 5; i++)
+    {   b[i] = (llong*)malloc(5 * sizeof(llong));
+	s[i] = (llong*)malloc(5 * sizeof(llong));
+    }
+    c = (llong*)malloc(5 * sizeof(llong));
+    d = (llong*)malloc(5 * sizeof(llong));
+    msg_i = (llong*)malloc(25 * sizeof(llong));
+    
     
     keccak("The quick brown fox jumps over the lazy dog.", 0/*44*/, total, bitrate, output);
     
-    (void) argc;
-    (void) argv;
+    
+    for (i = 0; i < 5; i++)
+    {   free(b[i]);
+	free(s[i]);
+    }
+    free(b);
+    free(c);
+    free(d);
+    free(s);
+    free(msg_i);
     
     return 0;
 }
