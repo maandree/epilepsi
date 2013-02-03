@@ -52,7 +52,24 @@ long nr;
  * @param   n  Rotation steps
  * @return     The value rotated
  */
-#define rotate(X, N)  (((X >> (w - (N % w))) + (X << (N % w))) & wmod)
+#define rotate(X, N)  (((llong)((unsigned llong)X >> (w - (N % w))) + (X << (N % w))) & wmod)
+
+
+/**
+ * Binary logarithm
+ * 
+ * @param   x  The value of which to calculate the binary logarithm
+ * @retunr     The binary logarithm
+ */
+inline long lb(long x)
+{
+    long rc_a = ((x & 0xFFFF0000L) != 0) << 4;
+    long rc_b = ((x & 0xFF00FF00L) != 0) << 3;
+    long rc_c = ((x & 0xF0F0F0F0L) != 0) << 2;
+    long rc_d = ((x & 0xCCCCCCCCL) != 0) << 1;
+    long rc_e = ((x & 0xAAAAAAAAL) != 0);
+    return rc_a + rc_b + rc_c + rc_d + rc_e;
+}
 
 
 /**
@@ -126,31 +143,20 @@ inline void keccakF(llong a[5][5])
 
 
 /**
- * Binary logarithm
+ * Convert a chunk of char:s to a long long
  * 
- * @param   x  The value of which to calculate the binary logarithm
- * @retunr     The binary logarithm
- */
-inline long lb(long x)
-{
-    long rc_a = ((x & 0xFFFF0000L) != 0) << 4;
-    long rc_b = ((x & 0xFF00FF00L) != 0) << 3;
-    long rc_c = ((x & 0xF0F0F0F0L) != 0) << 2;
-    long rc_d = ((x & 0xCCCCCCCCL) != 0) << 1;
-    long rc_e = ((x & 0xAAAAAAAAL) != 0);
-    return rc_a + rc_b + rc_c + rc_d + rc_e;
-}
-
-
-/**
- * FIXME document
+ * @param   message  The message
+ * @param   rr       Bitrate in bytes
+ * @param   ww       w in bytes
+ * @param   off      The offset in the message
+ * @return           Lane
  */
 inline llong toLane(char* message, long rr, long ww, long off)
 {
     llong rc = 0;
     long i;
     for (i = off + ww - 1; i >= off; i--)
-	rc += i < rr ? message[i] : 0;
+	rc = (rc << 8) | (i < rr ? message[i] : 0);
     return rc;
 }
 
@@ -176,7 +182,7 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
     l = lb(w);
     nr = 12 + (l << 1);
     
-    /* pad */
+    /* pad 10*1 */
     {
 	char* M;
 	char* m = msg;
@@ -186,11 +192,11 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	long ll = len % r;
 	long i;
 	
-        char byte = nbrf ? (((unsigned char)(msg[nrf]) >> (8 - nbrf)) + (1 << nbrf)) : 1;
+        char byte = nbrf ? (((unsigned char)(msg[nrf]) >> (8 - nbrf)) | (1 << nbrf)) : 1;
 	
-	if (((r - 8) <= ll) && (ll <= (r - 2)))
+	if ((r - 8 <= ll) && (ll <= r - 2))
 	{   M = message = (char*)malloc(len = nrf + 1);
-	    message[nrf] = byte + 128;
+	    message[nrf] = byte ^ -128;
 	}
 	else
 	{   len = nrf + 1;
@@ -201,8 +207,6 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	      message[i] = 0;
 	    message[len - 1] = -128;
 	}
-	for (i = 0; i < nrf; i++)
-	    message[i] = msg[i];
 	
 	#define __(X)   M[X] = m[X]
 	#define __0()  __(0x00)
@@ -281,7 +285,7 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
     
     /* absorbing phase */
     {   long m = len / r, rr = r >> 3, ww = w >> 3, i;
-        llong pi[5][5];
+        llong msg_i[5][5];
 	s[0][0] = s[0][1] = s[0][2] = s[0][3] = s[0][4] = 0;
 	s[1][0] = s[1][1] = s[1][2] = s[1][3] = s[1][4] = 0;
 	s[2][0] = s[2][1] = s[2][2] = s[2][3] = s[2][4] = 0;
@@ -290,13 +294,13 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	
 	for (i = 0; i < m; i += rr)
 	{   long x, y;
-	    for (x = 0; x < 5; x++)
-		for (y = 0; y < 5; y++)
+	    for (y = 0; y < 5; y++)
+	        for (x = 0; x < 5; x++)
 		{
 		    long off = (5 * y + x) * ww;
-		    pi[x][y] = toLane(message + i, rr, ww, off);
+		    msg_i[x][y] = toLane(message + i, rr, ww, off);
 		}
-	    #define ___s(X, Y)  s[X][Y] ^= pi[X][Y]
+	    #define ___s(X, Y)  s[X][Y] ^= msg_i[X][Y]
 	    #define __s(Y)      ___s(0, Y); ___s(1, Y); ___s(2, Y); ___s(3, Y); ___s(4, Y)
 	    __s(0); __s(1); __s(2); __s(3); __s(4);
 	    #undef __s
@@ -309,12 +313,12 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
     /* squeezing phase */
     {   long olen = n, rr = r >> 3, nn = n >> 3, i, j = 0;
 	while (olen > 0)
-	{   for (i = 0; (i < 25) && (i < rr) && (j < nn); i++, j++)
+	{   for (i = 0; (i < 25) && (i < rr) && (j < nn); i++)
 	    {   long _;
 		llong v = s[i % 5][i / 5];
-		for (_ = 0; _ < nn; _++)
+		for (_ = 0; (_ < 8) && (j < nn); _++, j++)
 		{   putchar(v & 255);
-		    v >>= 3;
+		    v >>= 8;
 	    }	}
 	    if ((olen -= r) > 0)
 		keccakF(s);
@@ -324,10 +328,14 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 
 int main(int argc, char** argv)
 {
+    long output  =  512;
+    long total   = 1600;
+    long bitrate = total - (output << 1);
+    
+    keccak("The quick brown fox jumps over the lazy dog.", 0/*44*/, total, bitrate, output);
+    
     (void) argc;
     (void) argv;
-    
-    keccak("keccak", 0, 1600, 576, 1024);
     
     return 0;
 }
