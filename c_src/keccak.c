@@ -21,18 +21,6 @@ const llong RC[] =
 	    0x8000000080008081, 0x8000000000008080, 0x0000000080000001, 0x8000000080008008
         };
 
-
-llong b[25][25];
-llong c[5];
-llong d[5];
-
-long capacity;
-long w;
-llong wmod;
-long l;
-long nr;
-
-
 /**
  * Rotation offsets
  */
@@ -45,6 +33,18 @@ const long R[] =
         };
 
 
+llong b[25][25];
+llong c[5];
+llong d[5];
+
+long capacity;
+long w;
+llong wmod;
+long l;
+long nr;
+
+
+
 /**
  * Rotate
  * 
@@ -52,10 +52,7 @@ const long R[] =
  * @param   n  Rotation steps
  * @return     The value rotated
  */
-inline llong rotate(llong x, long n)
-{
-    return ((x >> (w - (n % w))) + (x << (n % w))) & wmod;
-}
+#define rotate(X, N)  (((X >> (w - (N % w))) + (X << (N % w))) & wmod)
 
 
 /**
@@ -66,7 +63,7 @@ inline llong rotate(llong x, long n)
 inline void keccakFRound(llong a[5][5], llong rc)
 {
     /* θ step */
-    #define __c(X)  c[X] = a[X][1] ^ a[X][2] ^ a[X][3] ^ a[X][4] ^ a[X][5]
+    #define __c(X)  c[X] = a[X][0] ^ a[X][1] ^ a[X][2] ^ a[X][3] ^ a[X][4]
     __c(0);
     __c(1);
     __c(2);
@@ -129,21 +126,19 @@ inline void keccakF(llong a[5][5])
 
 
 /**
- * Binary logarithm of a 2-potents
+ * Binary logarithm
  * 
  * @param   x  The value of which to calculate the binary logarithm
  * @retunr     The binary logarithm
  */
-inline long lb1(long x)
+inline long lb(long x)
 {
     long rc_a = ((x & 0xFFFF0000L) != 0) << 4;
     long rc_b = ((x & 0xFF00FF00L) != 0) << 3;
     long rc_c = ((x & 0xF0F0F0F0L) != 0) << 2;
     long rc_d = ((x & 0xCCCCCCCCL) != 0) << 1;
     long rc_e = ((x & 0xAAAAAAAAL) != 0);
-    rc_a |= rc_b;
-    rc_c |= rc_d;
-    return rc_a | rc_c | rc_e;
+    return rc_a + rc_b + rc_c + rc_d + rc_e;
 }
 
 
@@ -165,7 +160,7 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
     capacity = b - r;
     w = b / 25;
     wmod = (one < w) - one;
-    l = lb1(w);
+    l = lb(w);
     nr = 12 + (l << 1);
     
     /* pad */
@@ -322,4 +317,7 @@ int main(int argc, char** argv)
     
     return 0;
 }
+
+
+#undef rotate
 
