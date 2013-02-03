@@ -201,8 +201,10 @@ void keccak(char* msg, long len, long b, long r, long n) /* 1600, 576, 1024 */
 	      message[i] = 0;
 	    message[len - 1] = -128;
 	}
+	for (i = 0; i < nrf; i++)
+	    message[i] = msg[i];
 	
-	#define __(X)   *(M + X) = *(m + X)
+	#define __(X)   M[X] = m[X]
 	#define __0()  __(0x00)
 	#define __1()  __(0x01)
 	#define __2()  __(0x02); __(0x03)
