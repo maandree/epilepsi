@@ -325,7 +325,7 @@ int main(int argc, char** argv)
     (void) argc;
     (void) argv;
     
-    keccak("", 0, 1600, 576, 1024);
+    keccak("keccak", 0, 1600, 576, 1024);
     
     return 0;
 }
