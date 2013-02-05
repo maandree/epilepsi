@@ -61,7 +61,7 @@ long nr;
  * Binary logarithm
  * 
  * @param   x  The value of which to calculate the binary logarithm
- * @retunr     The binary logarithm
+ * @return     The binary logarithm
  */
 inline long lb(long x)
 {
@@ -77,7 +77,8 @@ inline long lb(long x)
 /**
  * Perform one round of computation
  * 
- * @param  a  The current state
+ * @param  a   The current state
+ * @param  rc  Round constant
  */
 inline void keccakFRound(llong** a, llong rc)
 {
@@ -150,7 +151,7 @@ inline void keccakF(llong** a)
  * @param   message  The message
  * @param   len      The length of the message (after the pretruncation)
  * @param   rr       Bitrate in bytes
- * @param   ww       w in bytes
+ * @param   ww       Word size in bytes
  * @param   off      The offset in the message
  * @return           Lane
  */
