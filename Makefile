@@ -30,7 +30,7 @@ C_FALGS=$(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
 
 
 
-all: java c
+all: java
 
 java:
 	mkdir -p bin
@@ -39,10 +39,6 @@ java:
 	else                                                                    \
 	  $(JAVAC) $(JAVA_FLAGS) -cp src $(JAVA_FILES);                         \
 	fi
-
-
-c:
-	$(CC) $(C_FALGS) -o bin/keccak c_src/keccak.c
 
 
 test-checksum:
